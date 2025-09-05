@@ -1,0 +1,11 @@
+Asset,Weight,Risk_Contribution,Target_Contribution,Relative_Error,Notes
+PETR4,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+VALE3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+ITUB4,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+BBDC4,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+ABEV3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+B3SA3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+WEGE3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+RENT3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+LREN3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets
+ELET3,[ERC_optimized],[calculated_from_covariance],0.1000,[convergence_error],ERC solver seeks equal risk contributions across all assets

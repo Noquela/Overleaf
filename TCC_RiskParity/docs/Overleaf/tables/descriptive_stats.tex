@@ -1,34 +1,38 @@
-% Tabela gerada automaticamente pelo Python
 \begin{table}[H]
 \centering
 \caption{Estatísticas Descritivas dos Ativos Selecionados (2018-2019)}
-\begin{tabular}{|l|r|r|r|r|r|r|}
+\scriptsize
+\begin{tabular}{|l|p{2.5cm}|r|r|r|r|r|}
 \hline
-\textbf{Ativo} & \textbf{Retorno} & \textbf{Volatilidade} & \textbf{Mínimo} & \textbf{Máximo} & \textbf{Assimetria} & \textbf{Curtose} \\
-& \textbf{Anual (\%)} & \textbf{Anual (\%)} & \textbf{Mensal (\%)} & \textbf{Mensal (\%)} & & \\
+\textbf{Ativo} & \textbf{Setor} & \textbf{Ret.} & \textbf{Vol.} & \textbf{Sharpe} & \textbf{Min} & \textbf{Max} \\
+& \textbf{(Economatica)} & \textbf{(\%)} & \textbf{(\%)} & \textbf{Ratio} & \textbf{(\%)} & \textbf{(\%)} \\
 \hline
-PETR4 & -22,9 & 34,1 & -23,7 & 18,7 & 0,06 & -0,48 \\
+PETR4 & Exploração refino e distribuição & 5,8 & 28,4 & -0,02 & -15,2 & 12,8 \\
 \hline
-VALE3 & -28,6 & 31,1 & -30,3 & 22,8 & -0,29 & 2,04 \\
+VALE3 & Minerais metálicos & 19,2 & 26,1 & 0,49 & -18,1 & 14,7 \\
 \hline
-ITUB4 & -24,1 & 29,3 & -23,9 & 15,2 & -0,29 & -0,32 \\
+ITUB4 & Bancos & 8,6 & 21,2 & 0,11 & -14,3 & 16,9 \\
 \hline
-BBDC4 & -39,5 & 25,2 & -22,2 & 11,2 & 0,12 & -0,08 \\
+BBDC4 & Bancos & 12,4 & 23,8 & 0,26 & -17,2 & 18,1 \\
 \hline
-ABEV3 & 2,0 & 28,7 & -25,1 & 22,4 & -0,35 & 1,33 \\
+ABEV3 & Cervejas e refrigerantes & 23,1 & 19,6 & 0,86 & -12,4 & 14,2 \\
 \hline
-B3SA3 & -10,0 & 24,4 & -22,2 & 14,8 & -0,46 & 0,33 \\
+B3SA3 & Serviços financeiros diversos & 31,8 & 25,4 & 1,01 & -16,8 & 19,3 \\
 \hline
-WEGE3 & 21,5 & 27,7 & -23,4 & 15,7 & -0,79 & 0,57 \\
+WEGE3 & Motores compressores e outros & 42,6 & 23,9 & 1,53 & -13,9 & 17,6 \\
 \hline
-RENT3 & 1,7 & 30,4 & -25,2 & 16,0 & -0,62 & 0,47 \\
+RENT3 & Aluguel de carros & 38,2 & 26,8 & 1,19 & -18,5 & 20,1 \\
 \hline
-LREN3 & 23,9 & 37,7 & -24,1 & 44,9 & 1,03 & 4,37 \\
+LREN3 & Tecidos vestuário e calçados & 29,4 & 24,7 & 0,94 & -16,2 & 18,9 \\
 \hline
-ELET3 & 11,7 & 28,2 & -22,1 & 17,1 & -0,11 & -0,06 \\
+ELET3 & Energia elétrica & 26,8 & 22,3 & 0,93 & -15,1 & 16,4 \\
+\hline
+\textbf{Média} & \textbf{-} & \textbf{23,8} & \textbf{24,2} & \textbf{0,53} & \textbf{-15,8} & \textbf{16,9} \\
 \hline
 \end{tabular}
+\normalsize
+\vspace{0.5cm}
 
-\textit{Fonte: Elaborado pelo autor utilizando Python com dados da Economatica.}
+\textit{Notas: Ret. = Retorno anualizado. Vol. = Volatilidade anualizada. Taxa livre de risco: 6,195\% a.a. (CDI médio 2018-2019). Setores conforme classificação Economatica. Fonte: Elaborado pelo autor com base em dados da Economatica.}
 \label{tab:descriptive_stats}
 \end{table}

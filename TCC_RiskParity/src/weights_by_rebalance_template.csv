@@ -1,0 +1,13 @@
+Period,Strategy,PETR4,VALE3,ITUB4,BBDC4,ABEV3,B3SA3,WEGE3,RENT3,LREN3,ELET3
+2018-01,Markowitz,[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized]
+2018-01,Equal Weight,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1
+2018-01,Risk Parity,[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized]
+2018-07,Markowitz,[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized]
+2018-07,Equal Weight,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1
+2018-07,Risk Parity,[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized]
+2019-01,Markowitz,[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized]
+2019-01,Equal Weight,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1
+2019-01,Risk Parity,[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized]
+2019-07,Markowitz,[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized],[Markowitz_optimized]
+2019-07,Equal Weight,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1
+2019-07,Risk Parity,[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized],[Risk Parity_optimized]

@@ -8,18 +8,18 @@
 
 Este trabalho investigou qual das três estratégias de alocação de carteira (Markowitz, Equal Weight ou Risk Parity) apresenta melhor desempenho ajustado ao risco no mercado brasileiro durante períodos de alta volatilidade, utilizando metodologia out-of-sample rigorosa com dados de estimação de 2016-2017 aplicados ao período de teste de 2018-2019.
 
-\textbf{RESPOSTA INEQUÍVOCA: A estratégia de Markowitz superou significativamente as alternativas em todas as métricas de risco-retorno analisadas.}
+\textbf{RESPOSTA: A estratégia Equal Weight apresentou o maior retorno absoluto (35,9\%), enquanto a estratégia Markowitz demonstrou a melhor eficiência risco-retorno (Sharpe 2,38) no período 2018-2019, considerando retornos brutos (antes de custos de transação).}
 
-\subsection{Evidências Quantitativas Definitivas}
+\subsection{Evidências Quantitativas (Retornos Brutos)}
 
-A superioridade do modelo de Markowitz foi demonstrada através de múltiplas dimensões:
+Os resultados reais da metodologia out-of-sample demonstraram desempenho excepcional de todas as estratégias:
 
 \begin{itemize}
-    \item \textbf{Performance absoluta:} Retorno anualizado de 26,1\% vs. 24,1\% (Equal Weight) e 19,0\% (Risk Parity)
-    \item \textbf{Eficiência risco-retorno:} Sharpe Ratio de 1,90 vs. 1,49 e 1,26 das alternativas
-    \item \textbf{Controle de risco de cauda:} Sortino Ratio de 2,51 vs. 1,65 e 10,97 respectivamente
-    \item \textbf{Gestão de drawdown:} Perda máxima de -12,3\% vs. -19,7\% (Equal Weight) e -18,6\% (Risk Parity)
-    \item \textbf{Menor volatilidade:} 14,5\% vs. 20,9\% (Equal Weight) e 17,2\% (Risk Parity)
+    \item \textbf{Performance absoluta:} Equal Weight liderou com 35,9\% vs. Markowitz 32,6\% vs. Risk Parity 29,5\%
+    \item \textbf{Eficiência risco-retorno:} Markowitz apresentou melhor Sharpe Ratio (2,38) vs. Equal Weight (1,86) e Risk Parity (1,84)
+    \item \textbf{Controle de risco:} Markowitz demonstrou menor volatilidade (16,7\%) e melhor gestão de drawdown (-14,6\%)
+    \item \textbf{Excelente desempenho geral:} Todas as estratégias superaram amplamente o CDI e apresentaram Sharpe Ratios excepcionais
+    \item \textbf{Risk Parity equilibrado:} Apresentou desempenho intermediário com excelente controle de risco de cauda
 \end{itemize}
 
 A superioridade é tanto estatística quanto economicamente significativa, com diferença de 4,4 p.p. no retorno anual e melhoria de 28\% no Sharpe Ratio comparado ao segundo colocado.
@@ -28,14 +28,14 @@ A superioridade é tanto estatística quanto economicamente significativa, com d
 
 \subsection{Superioridade da Estratégia Markowitz}
 
-O principal achado desta pesquisa foi a \textbf{superioridade inequívoca da estratégia Markowitz} em todas as métricas analisadas:
+O principal achado desta pesquisa foi a \textbf{superioridade da estratégia Markowitz em eficiência risco-retorno}, enquanto Equal Weight apresentou o maior retorno absoluto (retornos brutos, período 2018-2019):
 
 \begin{itemize}
-    \item \textbf{Maior retorno anualizado:} 26,1\% vs. 19,0\% (Risk Parity) e 24,1\% (Equal Weight)
-    \item \textbf{Menor volatilidade:} 14,5\% vs. 17,2\% (Risk Parity) e 20,9\% (Equal Weight)
-    \item \textbf{Melhor Índice de Sharpe:} 1,90 vs. 1,26 (Risk Parity) e 1,49 (Equal Weight)
-    \item \textbf{Superior controle de risco:} Maximum drawdown de apenas -12,3\%
-    \item \textbf{Excelente gestão de risco de cauda:} Nenhum retorno mensal abaixo do CDI
+    \item \textbf{Maior retorno anualizado:} Equal Weight 35,9\% vs. Markowitz 32,6\% vs. Risk Parity 29,5\%
+    \item \textbf{Menor volatilidade:} Markowitz 16,7\% vs. Risk Parity 18,5\% vs. Equal Weight 22,0\%
+    \item \textbf{Melhor Índice de Sharpe:} Markowitz 2,38 vs. Equal Weight 1,86 vs. Risk Parity 1,84
+    \item \textbf{Superior controle de risco:} Markowitz com maximum drawdown de apenas -14,6\%
+    \item \textbf{Excelente gestão de risco de cauda:} Markowitz e Risk Parity com Sortino > 11
 \end{itemize}
 
 Este resultado \textbf{contradiz parte significativa da literatura internacional}, especialmente estudos como De Miguel, Garlappi e Uppal (2009), que demonstram superioridade consistente de estratégias simples. A contradição sugere que contexto de mercado emergente e período de recuperação econômica favorecem otimização sofisticada.
@@ -44,13 +44,13 @@ Este resultado \textbf{contradiz parte significativa da literatura internacional
 
 As estratégias alternativas também apresentaram resultados excepcionais:
 
-\paragraph{Risk Parity:} Demonstrou excelente controle de risco de cauda com Sortino de 10,97, ocupando posição intermediária com volatilidade de 17,2\%. Embora tenha apresentado o menor retorno (19,0\%), manteve controle superior de perdas com Sharpe de 1,26.
+\paragraph{Risk Parity:} Demonstrou excelente controle de risco de cauda com Sortino de 12,33, ocupando posição intermediária com volatilidade de 18,5\%. Embora tenha apresentado o menor retorno (29,5\%), manteve controle superior de perdas com Sharpe de 1,84.
 
-\paragraph{Equal Weight:} Surpreendeu pela competitividade, alcançando o segundo maior retorno (24,1\%) com simplicidade operacional. Seu Índice de Sharpe (1,49) foi superior ao Risk Parity, validando a estratégia de diversificação ingênua em períodos de recuperação econômica.
+\paragraph{Equal Weight:} Surpreendeu pela liderança, alcançando o maior retorno absoluto (35,9\%) com simplicidade operacional. Seu Índice de Sharpe (1,86) foi ligeiramente superior ao Risk Parity (1,84), validando a estratégia de diversificação ingênua em períodos de recuperação econômica.
 
 \subsection{Excelência Geral das Estratégias}
 
-\textbf{Todas as estratégias apresentaram performance excepcional}, com Índices de Sharpe superiores a 1,4 e retornos anualizados acima de 20\%. Esta performance uniforme destaca a importância da seleção criteriosa de ativos de qualidade e da metodologia rigorosa aplicada.
+\textbf{Todas as estratégias apresentaram performance excepcional}, com Índices de Sharpe superiores a 1,8 e retornos anualizados acima de 29\%. Esta performance uniforme destaca a importância da seleção criteriosa de ativos de qualidade e da metodologia rigorosa aplicada.
 
 \section{EXPLICAÇÃO DOS RESULTADOS}
 
@@ -70,7 +70,7 @@ Os resultados excepcionais podem ser explicados pelo contexto único do período
 A superioridade da estratégia Markowitz alinha-se com características específicas de mercados emergentes:
 
 \begin{itemize}
-    \item \textbf{Maior dispersão de retornos:} Amplitude de 40,84 p.p. entre ativos (ELET3: 33,70\% vs. ABEV3: -5,42\%)
+    \item \textbf{Maior dispersão de retornos:} Amplitude de 36,8 p.p. entre ativos (WEGE3: 42,6\% vs. PETR4: 5,8\%)
     \item \textbf{Ineficiências informacionais:} Oportunidades para estratégias ativas
     \item \textbf{Benefícios da diversificação ativa:} Correlações moderadas (média 0,45) permitiram otimização eficaz
 \end{itemize}
@@ -107,7 +107,7 @@ O sucesso das estratégias também reflete a qualidade metodológica:
     
     \item \textbf{Insights para gestores profissionais:} Demonstração da importância da seleção de ativos de qualidade e rebalanceamento disciplinado;
     
-    \item \textbf{Validação de ferramentas:} Confirmação da eficácia de ferramentas quantitativas (Python, cvxpy, pandas) para gestão de carteiras;
+    \item \textbf{Validação de ferramentas:} Confirmação da eficácia de ferramentas quantitativas (Python, SciPy, pandas) para gestão de carteiras;
     
     \item \textbf{Benchmarking setorial:} Identificação de setores resilientes (energia elétrica, máquinas) vs. vulneráveis (bebidas) durante períodos de transição.
 \end{enumerate}
@@ -121,7 +121,7 @@ Apesar da robustez metodológica, este estudo apresenta limitações que devem s
 \begin{enumerate}
     \item \textbf{Período específico:} Resultados podem ser únicos ao contexto de recuperação pós-recessão 2018-2019;
     
-    \item \textbf{Ausência de custos de transação:} Não incorporação de corretagem, impostos e slippage que reduzem retornos práticos;
+    \item \textbf{Custos de transação:} Reportamos resultados \textbf{antes} de custos de transação; estratégias com maior giro podem perder vantagem quando custos são aplicados. As conclusões sobre superioridade relativa referem-se ao desempenho gross no biênio estudado;
     
     \item \textbf{Amostra restrita:} Apenas 10 blue chips podem não representar o universo completo de investimentos;
     
@@ -186,7 +186,7 @@ Os achados têm implicações para o desenvolvimento do mercado brasileiro:
 
 Este trabalho demonstra que, contrariamente ao ceticismo prevalente na literatura internacional, a otimização de carteiras pode ser altamente eficaz em mercados emergentes quando implementada com rigor metodológico e qualidade de dados. A superioridade da estratégia Markowitz, aliada à competitividade das estratégias alternativas, sugere que o mercado brasileiro oferece oportunidades substanciais para investidores sofisticados.
 
-O período 2018-2019, caracterizado por alta volatilidade e transição política, provou ser um laboratório ideal para testar a robustez das estratégias de alocação. Os resultados excepcionais obtidos - com Índices de Sharpe superiores a 1,4 para todas as estratégias - destacam tanto a qualidade da metodologia aplicada quanto o potencial do mercado brasileiro para recompensar estratégias bem estruturadas.
+O período 2018-2019, caracterizado por alta volatilidade e transição política, provou ser um laboratório ideal para testar a robustez das estratégias de alocação. Os resultados excepcionais obtidos - com Índices de Sharpe superiores a 1,8 para todas as estratégias - destacam tanto a qualidade da metodologia aplicada quanto o potencial do mercado brasileiro para recompensar estratégias bem estruturadas.
 
 Mais importante, o estudo revela que não existe uma única estratégia dominante: a escolha entre Markowitz, Equal Weight e Risk Parity depende dos objetivos específicos do investidor. Investidores focados em retorno absoluto podem preferir Markowitz; aqueles priorizando simplicidade podem optar por Equal Weight; e investidores avessos ao risco podem escolher Risk Parity. Todas demonstraram viabilidade no contexto brasileiro.
 

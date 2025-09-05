@@ -2,7 +2,7 @@
 Gerador de Figuras REAIS do TCC - Baseado na Metodologia Real
 Substitui todos os scripts anteriores com dados simulados
 
-Bruno Gasparini Ballerini - 2025
+Bruno Gasparoni Ballerini - 2025
 Todas as figuras usam dados REAIS da metodologia implementada
 """
 
@@ -15,6 +15,8 @@ from economatica_loader import EconomaticaLoader
 import warnings
 import os
 warnings.filterwarnings('ignore')
+
+# CONFIGURAÇÃO: Versão final NÃO permite fallbacks/simulações - REMOVIDOS
 
 # Configuração matplotlib
 plt.rcParams['font.size'] = 11
@@ -37,7 +39,7 @@ class RealFigureGenerator:
         
         print("=== GERADOR DE FIGURAS REAIS ===")
         print("FONTE: Dados reais da metodologia final_methodology.py")
-        print("CDI: 6,195% a.a. (validado Investidor10/B3/BCB)")
+        print("CDI: 6,195% a.a. (média geométrica BCB/ANBIMA)")
         
     def setup_methodology(self):
         """Configura e executa a metodologia real"""
@@ -61,13 +63,7 @@ class RealFigureGenerator:
         Extrai resultados REAIS da metodologia executada (elimina hardcodes)
         """
         if not self.analyzer or not self.results:
-            print("AVISO: Metodologia não executada, usando valores de referência")
-            # Valores de referência baseados em execuções anteriores validadas
-            return {
-                'Markowitz': {'return': 26.14, 'volatility': 14.49, 'sharpe': 1.90, 'sortino': 2.51, 'drawdown': -12.3},
-                'Equal Weight': {'return': 24.12, 'volatility': 20.87, 'sharpe': 1.49, 'sortino': 1.65, 'drawdown': -19.7},
-                'Risk Parity': {'return': 19.01, 'volatility': 17.21, 'sharpe': 1.26, 'sortino': 10.97, 'drawdown': -18.6}
-            }
+            raise RuntimeError("ERRO FATAL: Metodologia não executada. Figuras finais exigem dados reais da metodologia.")
         
         # Consolidar resultados da metodologia real
         consolidated = self.analyzer.consolidate_final_results(self.results)
@@ -117,24 +113,26 @@ class RealFigureGenerator:
                         # Estimar parâmetros
                         cov_matrix = est_data.cov() * 12  # Anualizada
                         
-                        # Simular pesos típicos de cada estratégia
-                        n_assets = len(assets)
+                        # Extrair pesos REAIS das estratégias da metodologia executada
+                        # Verificar se temos histórico de pesos das carteiras
+                        if not hasattr(self.analyzer, 'portfolio_weights_history') or not self.analyzer.portfolio_weights_history:
+                            raise RuntimeError("ERRO: Histórico de pesos das carteiras não disponível na metodologia.")
                         
-                        # Markowitz: concentrado (simular otimização)
-                        volatilities = est_data.std() * np.sqrt(12)
-                        inv_vol = 1 / volatilities
-                        markowitz_weights = inv_vol / inv_vol.sum()
-                        # Adicionar concentração (simular otimização Sharpe)
-                        top_assets = markowitz_weights.nlargest(3).index
-                        for asset in top_assets:
-                            markowitz_weights[asset] *= 1.5
-                        markowitz_weights = markowitz_weights / markowitz_weights.sum()
+                        # Usar pesos do último rebalanceamento (mais recente)
+                        latest_weights_data = self.analyzer.portfolio_weights_history[-1]
+                        latest_weights = latest_weights_data['weights']
                         
-                        # Risk Parity: aproximadamente igual
-                        rp_weights = pd.Series(1/n_assets, index=assets)
+                        # Extrair pesos reais de cada estratégia
+                        if ('Markowitz' not in latest_weights or 
+                            'Risk Parity' not in latest_weights or 
+                            'Equal Weight' not in latest_weights):
+                            raise RuntimeError("ERRO: Pesos das estratégias não encontrados no histórico da metodologia.")
                         
-                        # Equal Weight: exatamente igual
-                        ew_weights = pd.Series(1/n_assets, index=assets)
+                        markowitz_weights = latest_weights['Markowitz']
+                        rp_weights = latest_weights['Risk Parity'] 
+                        ew_weights = latest_weights['Equal Weight']
+                        
+                        print(f"Usando pesos reais do período: {latest_weights_data['period']}")
                         
                         # Calcular contribuições de risco aproximadas
                         def calc_risk_contrib(weights, cov_matrix):
@@ -153,24 +151,10 @@ class RealFigureGenerator:
                         return markowitz_contrib, risk_parity_contrib, equal_weight_contrib
                         
         except Exception as e:
-            print(f"AVISO: Erro ao extrair contribuições reais: {e}")
+            raise RuntimeError(f"ERRO FATAL: Não foi possível extrair contribuições reais da metodologia: {e}")
         
-        # Fallback para valores de referência
-        print("Usando contribuições de referência")
-        n_assets = len(assets)
-        
-        # Valores de referência baseados na implementação ERC
-        markowitz_contrib = [4, 8, 11, 9, 21, 12, 17, 10, 5, 3][:n_assets]
-        risk_parity_contrib = [10] * n_assets  # Equalizado
-        equal_weight_contrib = [12, 15, 8, 7, 6, 9, 11, 13, 17, 2][:n_assets]
-        
-        # Normalizar
-        for contrib_list in [markowitz_contrib, risk_parity_contrib, equal_weight_contrib]:
-            total = sum(contrib_list)
-            for i in range(len(contrib_list)):
-                contrib_list[i] = contrib_list[i] / total * 100
-                
-        return markowitz_contrib, risk_parity_contrib, equal_weight_contrib
+        # Se chegou até aqui, metodologia não retornou dados válidos
+        raise RuntimeError("ERRO FATAL: Metodologia executada mas não retornou contribuições de risco válidas.")
     
     def _save_figure(self, filename):
         """
@@ -291,27 +275,16 @@ class RealFigureGenerator:
         dates = pd.date_range('2018-01-31', periods=len(portfolio_returns['Markowitz']), freq='M')
         
         # Calcular evolução do patrimônio (base 100)
+        # CORREÇÃO: Se monthly_return é logarítmico, usar exp() em vez de (1 + r)
         portfolio_values = {}
         for strategy in ['Markowitz', 'Equal Weight', 'Risk Parity']:
             values = [100]  # Base 100 em jan/2018
             for monthly_return in portfolio_returns[strategy]:
-                values.append(values[-1] * (1 + monthly_return))
+                # Assumindo retornos logarítmicos do economatica_loader
+                values.append(values[-1] * np.exp(monthly_return))
             portfolio_values[strategy] = values[:-1]  # Remove último valor extra
             
-        # Criar benchmark Ibovespa (aproximado para comparação)
-        ibovespa_values = [100]
-        ibovespa_monthly_return = 0.006  # ~7.5% anual
-        ibovespa_vol = 0.058  # ~20% anual vol
-        
-        np.random.seed(42)  # Reproduzibilidade
-        for i in range(len(dates)):
-            monthly_ret = np.random.normal(ibovespa_monthly_return, ibovespa_vol)
-            ibovespa_values.append(ibovespa_values[-1] * (1 + monthly_ret))
-        
-        # Ajustar Ibovespa para ~15% total no período
-        ibovespa_final = 115.0
-        factor = ibovespa_final / ibovespa_values[-1]
-        ibovespa_values = [v * factor for v in ibovespa_values[:-1]]
+        # Ibovespa comparison removed - focusing on portfolio strategies comparison
         
         # Plotar
         plt.figure(figsize=(14, 8))
@@ -326,11 +299,8 @@ class RealFigureGenerator:
         plt.plot(dates_full, [100] + portfolio_values['Risk Parity'], 
                 label=f'Risk Parity ({self.real_results["Risk Parity"]["return"]:.1f}% a.a.)', 
                 linewidth=2.8, color='orange', alpha=0.85)
-        plt.plot(dates_full, [100] + ibovespa_values, 
-                label='Ibovespa (benchmark)', 
-                linewidth=2, color='red', linestyle='--', alpha=0.7)
         
-        plt.title('Evolução das Carteiras vs. Ibovespa (2018-2019)\n' +
+        plt.title('Evolução das Carteiras (2018-2019)\n' +
                  'Fonte: Metodologia real com rebalanceamento semestral', fontsize=13, pad=20)
         plt.xlabel('Período', fontsize=12)
         plt.ylabel('Valor da Carteira (Base 100 = Jan/2018)', fontsize=12)
@@ -412,32 +382,9 @@ class RealFigureGenerator:
         # Usar dados dos resultados reais
         max_dd = {'Markowitz': -12.3, 'Equal Weight': -19.7, 'Risk Parity': -18.6}
         
-        # Simular trajetórias que atingem esses máximos
-        np.random.seed(42)
-        drawdowns = {}
-        
-        for strategy, max_drawdown in max_dd.items():
-            # Simular trajetória que atinge o drawdown máximo
-            dd_series = []
-            current_dd = 0.0
-            max_reached = False
-            
-            for i, date in enumerate(dates):
-                if not max_reached and i > len(dates) // 3:  # Máximo no meio do período
-                    if np.random.random() < 0.1:  # 10% chance de ser o máximo
-                        current_dd = max_drawdown / 100
-                        max_reached = True
-                    else:
-                        current_dd = min(0, current_dd + np.random.normal(0, 0.015))
-                elif max_reached:
-                    # Recuperação gradual
-                    current_dd = min(0, current_dd + np.random.normal(0.005, 0.01))
-                else:
-                    current_dd = min(0, current_dd + np.random.normal(0, 0.01))
-                    
-                dd_series.append(current_dd * 100)
-                
-            drawdowns[strategy] = dd_series
+        # REMOVIDO: Simulação de trajetórias de drawdown
+        # Versão final deve usar dados reais da metodologia
+        raise RuntimeError("ERRO FATAL: Simulação de drawdown removida. Use dados reais da metodologia ou remova este gráfico.")
         
         plt.figure(figsize=(14, 6))
         
@@ -466,12 +413,11 @@ class RealFigureGenerator:
         """Figura: Contribuição de risco por ativo"""
         print("Gerando análise de contribuição de risco...")
         
-        # Obter ativos da metodologia real
-        if self.analyzer and hasattr(self.analyzer, 'full_returns') and self.analyzer.full_returns is not None:
-            assets = list(self.analyzer.full_returns.columns)
-        else:
-            # Fallback para ativos conhecidos
-            assets = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'B3SA3', 'WEGE3', 'RENT3', 'LREN3', 'ELET3']
+        # Obter ativos da metodologia real - OBRIGATÓRIO
+        if not (self.analyzer and hasattr(self.analyzer, 'full_returns') and self.analyzer.full_returns is not None):
+            raise RuntimeError("ERRO FATAL: Lista de ativos não disponível na metodologia executada.")
+        
+        assets = list(self.analyzer.full_returns.columns)
         
         # Tentar extrair contribuições reais da metodologia
         if self.analyzer and hasattr(self.analyzer, 'results_history') and self.analyzer.results_history:
@@ -545,11 +491,11 @@ class RealFigureGenerator:
             print("AVISO: Usando dados pré-validados para figuras")
             
         # Gerar todas as figuras
-        self.create_correlation_matrix()      # Figura 4.6
-        self.create_price_evolution()         # Figura 4.7  
-        self.create_portfolio_evolution()     # Figura 4.9
-        self.create_risk_return_plot()        # Figura 4.10
-        self.create_drawdown_analysis()       # Figura adicional
+        self.create_correlation_matrix()      # Figura 4.1
+        self.create_price_evolution()         # Figura 4.2  
+        self.create_portfolio_evolution()     # Figura 4.6 (Evolução das Carteiras)
+        self.create_risk_return_plot()        # Figura 4.7 (Risco-Retorno)
+        self.create_drawdown_analysis()       # Figura 4.9 (Evolução dos Drawdowns)
         self.create_risk_contribution_chart() # Figura adicional
         
         print(f"\nSUCESSO: TODAS AS FIGURAS GERADAS!")

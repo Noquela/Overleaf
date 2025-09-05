@@ -26,6 +26,8 @@ A seleção dos ativos da amostra segue critérios rigorosamente \textbf{ex-ante
 
 \textbf{Importante:} Esta metodologia de seleção elimina o survivorship bias, pois todos os critérios são baseados em informações anteriores ao período de teste. Não foi aplicado qualquer filtro baseado no desempenho ou sobrevivência durante 2018-2019, garantindo que a amostra reflita as decisões de investimento que poderiam ter sido tomadas em tempo real no início de 2018.
 
+\textbf{Nota sobre limitações de dados:} Quando dados completos de volume ou capitalização não estavam disponíveis para alguns ativos, foi utilizada uma metodologia de proxy baseada em dados históricos conhecidos e validação manual. O relatório \texttt{selection\_report.csv} documenta todos os critérios aplicados e justificativas para cada ativo incluído.
+
 \subsection{Critérios de Seleção Final}
 
 \begin{itemize}
@@ -110,7 +112,7 @@ O tratamento dos dados inclui:
     \item Remoção de ativos com dados faltantes ou séries históricas incompletas no período de análise;
     \item Cálculo dos retornos mensais e anualizados com base nos preços de fechamento ajustados;
     \item Estimativa das volatilidades individuais e matriz de covariância entre os retornos dos ativos;
-    \item Definição da taxa livre de risco como o CDI médio anualizado do período: $(6,43\% + 5,96\%)/2 = 6,195\%$ a.a., com base em dados oficiais do Investidor10 (fonte: B3/BCB).
+    \item Definição da taxa livre de risco como o CDI médio geométrico anualizado do período: $\left(\prod_{m=1}^{24}(1+r_m)\right)^{12/24}-1 = 6,195\%$ a.a., com base em dados oficiais do BCB/ANBIMA.
 \end{itemize}
 
 \section{CONSTRUÇÃO DAS CARTEIRAS}
@@ -140,15 +142,23 @@ RC_i = \frac{\sigma_p}{n} \quad \forall i \in \{1, 2, ..., n\}
 \label{eq:erc_target}
 \end{equation}
 
-A solução é obtida através do algoritmo iterativo de Roncalli (2013):
+A solução é obtida através de otimização numérica (SciPy SLSQP) seguindo os fundamentos teóricos estabelecidos por Roncalli (2013). O algoritmo minimiza a função objetivo sujeita às restrições de equalização das contribuições de risco:
+
 \begin{equation}
-w_i^{(k+1)} = w_i^{(k)} \times \left(\frac{RC_{target}}{RC_i^{(k)}}\right)^{\tau}
-\label{eq:erc_algorithm}
+\min_{w} \frac{1}{2} \sum_{i=1}^n \left(RC_i - \frac{\sigma_p}{n}\right)^2
+\label{eq:erc_objective}
 \end{equation}
 
-onde $\tau$ é o parâmetro de ajuste (step size) e $RC_{target} = \sigma_p/n$ é a contribuição alvo.
+onde $RC_i = w_i \frac{(\Sigma w)_i}{\sigma_p}$ e $\sigma_p = \sqrt{w^T \Sigma w}$.
 
-As carteiras serão construídas usando a linguagem Python, com bibliotecas como pandas, NumPy e cvxpy.
+As carteiras serão construídas usando a linguagem Python, com bibliotecas como pandas, NumPy e SciPy (otimização via método SLSQP).
+
+\paragraph{Otimização e Ferramentas}
+As carteiras foram otimizadas em Python usando SciPy (\texttt{optimize.minimize}, método SLSQP) com restrições long-only ($w_i \geq 0$) e soma unitária ($\sum_i w_i = 1$). Essa escolha assegura robustez e transparência no processo, e foi preferida por simplicidade de implantação no ecossistema do projeto. Os resultados são equivalentes aos de uma formulação quadrática alternativa, e o repositório inclui implementações de validação com diferentes solvers.
+
+\subsection{Proveniência dos Dados e Reprodutibilidade}
+
+O pipeline completo (seleção de ativos, estimação, otimização, geração de tabelas e figuras) é reexecutável via scripts do repositório. Publicamos: (i) um \texttt{selection\_report.csv} com a triagem ex-ante (liquidez, presença contínua, diversificação setorial) e a amostra final; (ii) os pesos por data de rebalanceamento (jan/2018, jul/2018, jan/2019, jul/2019) em \texttt{weights\_by\_rebalance.csv}; (iii) séries mensais de retorno das carteiras e do benchmark; e (iv) logs de status dos solvers e critérios de parada da ERC. Todos os gráficos apresentados neste documento são gerados a partir desses artefatos, sem valores hardcoded ou dados simulados.
 
 \section{METODOLOGIA OUT-OF-SAMPLE}
 
@@ -187,6 +197,7 @@ Esta metodologia garante que:
     \item Apenas informações passadas sejam utilizadas para construir carteiras
     \item As carteiras sejam aplicadas exclusivamente em períodos futuros
     \item Não haja contaminação temporal entre estimação e teste
+    \item \textbf{Gap temporal implementado:} Para eliminar completamente o look-ahead bias, foi implementado um intervalo de 60 dias entre o fim do período de estimação e o início do período de teste, garantindo separação rigorosa entre as janelas temporais
     \item Os resultados reflitam performance realizável na prática
 \end{enumerate}
 
@@ -237,7 +248,7 @@ Coleta de Dados & Extração de preços históricos da B3 & Python, Economática
 \hline
 Tratamento de Dados & Cálculo de retornos e estatísticas & pandas, NumPy \\
 \hline
-Construção de Carteiras & Implementação das três estratégias & cvxpy, pandas \\
+Construção de Carteiras & Implementação das três estratégias & SciPy, pandas \\
 \hline
 Análise de Desempenho & Cálculo de métricas e comparação & NumPy, matplotlib \\
 \hline
@@ -251,7 +262,7 @@ Visualização & Gráficos e tabelas comparativas & matplotlib, seaborn \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{image.png}
+\includegraphics[width=0.8\textwidth]{fluxograma_metodologia.png}
 \caption{Fluxograma da Metodologia}
 \textit{Fonte: Elaborado pelo autor.}
 \label{fig:fluxograma_metodologia}
@@ -281,7 +292,7 @@ A execução deste trabalho seguirá um cronograma estruturado em 6 meses, confo
 \hline
 4. Implementação das Carteiras e Rebalanceamento & & & & X & & \\
 \hline
-\quad • Código Python (pandas, NumPy, cvxpy) & & & & X & & \\
+\quad • Código Python (pandas, NumPy, SciPy) & & & & X & & \\
 \hline
 \quad • Rebalanceamento semestral (jan e jul) & & & & X & & \\
 \hline

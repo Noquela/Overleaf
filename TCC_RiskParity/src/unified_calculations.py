@@ -2,12 +2,59 @@
 Cálculos Unificados para TCC - Elimina Inconsistências
 Resolve contradição entre Tabelas 4.1 e 4.2
 
-Bruno Gasparini Ballerini - 2025
+Bruno Gasparoni Ballerini - 2025
 """
 
 import pandas as pd
 import numpy as np
 from typing import Dict, Tuple, Union, Optional
+
+def equity_from_log(log_returns: pd.Series, initial_value: float = 1.0) -> pd.Series:
+    """
+    Converte retornos logarítmicos para série de equity (valor acumulado)
+    
+    Args:
+        log_returns: Série de retornos logarítmicos
+        initial_value: Valor inicial da série (default: 1.0)
+        
+    Returns:
+        pd.Series: Série de valores acumulados (equity curve)
+    """
+    if len(log_returns) == 0:
+        return pd.Series(dtype=float)
+    
+    # Para retornos logarítmicos: equity = initial_value * exp(cumsum(log_returns))
+    cumulative_log_returns = log_returns.cumsum()
+    equity = initial_value * np.exp(cumulative_log_returns)
+    
+    return equity
+
+def drawdown_from_log(log_returns: pd.Series) -> Tuple[pd.Series, float]:
+    """
+    Calcula drawdown series e máximo drawdown de retornos logarítmicos
+    
+    Args:
+        log_returns: Série de retornos logarítmicos
+        
+    Returns:
+        Tuple[pd.Series, float]: (série de drawdowns, máximo drawdown)
+    """
+    if len(log_returns) == 0:
+        return pd.Series(dtype=float), 0.0
+    
+    # Converter para equity curve
+    equity = equity_from_log(log_returns)
+    
+    # Calcular running maximum (peak)
+    running_max = equity.expanding().max()
+    
+    # Drawdown = (valor atual - pico) / pico
+    drawdown_series = (equity - running_max) / running_max
+    
+    # Máximo drawdown (valor mais negativo)
+    max_drawdown = drawdown_series.min()
+    
+    return drawdown_series, max_drawdown
 
 class UnifiedCalculations:
     """
@@ -121,11 +168,9 @@ class UnifiedCalculations:
             min_monthly_return = period_returns.min() * 100
             max_monthly_return = period_returns.max() * 100
             
-            # 6. Drawdown aproximado
-            cumulative_returns = (1 + period_returns).cumprod()
-            rolling_max = cumulative_returns.expanding().max()
-            drawdowns = (cumulative_returns - rolling_max) / rolling_max
-            max_drawdown = drawdowns.min() * 100
+            # 6. Drawdown usando função utilitária para log-returns
+            _, max_drawdown_decimal = drawdown_from_log(period_returns)
+            max_drawdown = max_drawdown_decimal * 100
             
             stats_list.append({
                 'Asset': asset,

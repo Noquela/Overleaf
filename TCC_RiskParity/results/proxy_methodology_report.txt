@@ -1,0 +1,49 @@
+
+METODOLOGIA DE PROXY PARA SELEÇÃO DE ATIVOS
+============================================
+
+1. CRITÉRIOS DE SELEÇÃO EX-ANTE:
+   - Liquidez: Volume médio diário > R$ 50 milhões (2016-2017)
+   - Tamanho: Blue chips com alta capitalização de mercado
+   - Diversificação: Máximo 2 ativos por setor econômico
+   - Sobrevivência: Ativos negociados durante todo período 2018-2019
+
+2. PROXY METHODOLOGY:
+   - Volume diário usado como proxy para liquidez
+   - Capitalização de mercado como proxy para tamanho da empresa
+   - Classificação setorial como proxy para diversificação
+   - Histórico de negociação como proxy para survivorship bias
+
+3. JUSTIFICATIVA DOS PROXIES:
+   - PETR3 → PETR4: Petrobras PN teve maior liquidez em 2018-2019
+   - Volume médio diário: Melhor proxy disponível para liquidez
+   - Setores econômicos: Proxy para correlação entre negócios
+   - Período 2016-2017: Dados ex-ante evitam look-ahead bias
+
+4. LIMITAÇÕES RECONHECIDAS:
+   - Volume não reflete perfeitamente a liquidez (spread, impacto)
+   - Classificação setorial pode ser imprecisa
+   - Dados históricos podem não refletir comportamento futuro
+   - Seleção manual pode introduzir viés subjetivo
+
+5. ATIVOS SELECIONADOS: 10
+   - PETR4: Petróleo Brasileiro S.A. (Petróleo e Gás)
+   - VALE3: Vale S.A. (Mineração)
+   - ITUB4: Itaú Unibanco Holding S.A. (Finanças e Seguros)
+   - BBDC4: Banco Bradesco S.A. (Finanças e Seguros)
+   - ABEV3: Ambev S.A. (Bebidas)
+   - B3SA3: B3 S.A. (Finanças e Seguros)
+   - WEGE3: WEG S.A. (Máquinas e Equipamentos)
+   - RENT3: Localiza Rent a Car S.A. (Outros Serviços)
+   - LREN3: Lojas Renner S.A. (Comércio)
+   - ELET3: Centrais Elétricas Brasileiras (Energia Elétrica)
+
+6. DISTRIBUIÇÃO SETORIAL:
+   - Petróleo e Gás: 1 ativos
+   - Mineração: 1 ativos
+   - Finanças e Seguros: 3 ativos
+   - Bebidas: 1 ativos
+   - Máquinas e Equipamentos: 1 ativos
+   - Outros Serviços: 1 ativos
+   - Comércio: 1 ativos
+   - Energia Elétrica: 1 ativos

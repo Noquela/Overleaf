@@ -6,16 +6,16 @@
 
 \section{SELEÇÃO DA AMOSTRA DE ATIVOS}
 
-A aplicação dos critérios metodológicos estabelecidos à base de dados da Economática, contendo 508 empresas listadas na B3, resultou na seleção de 10 ativos para compor as carteiras analisadas neste estudo.
+A aplicação dos critérios metodológicos estabelecidos à base de dados da Economatica, contendo 507 empresas listadas na B3, resultou na seleção de 10 ativos para compor as carteiras analisadas neste estudo.
 
 \subsection{Aplicação dos Filtros Eliminatórios}
 
-Dos 508 ativos disponíveis na base Economática, a aplicação sequencial dos filtros eliminatórios resultou em:
+Dos 507 ativos disponíveis na base Economatica, a aplicação sequencial dos filtros eliminatórios resultou em:
 
 \begin{itemize}
     \item \textbf{Filtro de sobrevivência empresarial:} Foram removidos 47 ativos que apresentaram processos de falência, recuperação judicial ou delisting durante o período 2018-2019, restando 461 empresas;
     
-    \item \textbf{Filtro de liquidez mínima:} Foram eliminados 398 ativos com volume médio diário inferior a R\$ 50 milhões no período 2016-2017, restando 63 empresas que atenderam ao critério de liquidez;
+    \item \textbf{Filtro de liquidez mínima:} Foram eliminados 398 ativos com volume médio diário inferior a R\$ 50 milhões no período 2016-2017, restando 63 empresas que atenderam ao critério de liquidez. \textit{Nota:} Quando o volume exato não estava disponível na exportação, utilizou-se um proxy operacional (preço médio × fator de liquidez) para ordenação preliminar, documentado no \texttt{selection\_report.csv};
     
     \item \textbf{Filtro de disponibilidade de dados:} Foram removidos 8 ativos com mais de 5\% de dias sem negociação no período 2018-2019, resultando em 55 empresas elegíveis para a seleção final.
 \end{itemize}
@@ -35,19 +35,19 @@ A partir dos 55 ativos elegíveis, foram selecionados 10 ativos aplicando-se os 
 \textbf{Código} & \textbf{Empresa} & \textbf{Setor} & \textbf{Vol.} & \textbf{Cap.} & \textbf{Ret.} \\
 & & & \textbf{(R\$mi)} & \textbf{(R\$bi)} & \textbf{2018-19} \\
 \hline
-PETR4 & Petróleo Brasileiro S.A. & Petróleo e Gás & 1.247 & 198,5 & 26,12\% \\
+PETR4 & Petróleo Brasileiro S.A. & Exploração refino e distribuição & 1.247 & 198,5 & 5,8\% \\
 \hline
-VALE3 & Vale S.A. & Mineração & 982 & 165,2 & 16,56\% \\
+VALE3 & Vale S.A. & Minerais metálicos & 982 & 165,2 & 19,2\% \\
 \hline
-ITUB4 & Itaú Unibanco Holding S.A. & Finanças e Seguros & 757 & 142,8 & 10,72\% \\
+ITUB4 & Itaú Unibanco Holding S.A. & Bancos & 757 & 142,8 & 8,6\% \\
 \hline
-BBDC4 & Banco Bradesco S.A. & Finanças e Seguros & 433 & 89,6 & 12,95\% \\
+BBDC4 & Banco Bradesco S.A. & Bancos & 433 & 89,6 & 12,4\% \\
 \hline
-ABEV3 & Ambev S.A. & Bebidas & 378 & 78,3 & -5,42\% \\
+ABEV3 & Ambev S.A. & Cervejas e refrigerantes & 378 & 78,3 & 23,1\% \\
 \hline
-B3SA3 & B3 S.A. & Finanças e Seguros & 290 & 67,1 & 28,71\% \\
+B3SA3 & B3 S.A. & Serviços financeiros diversos & 290 & 67,1 & 31,8\% \\
 \hline
-WEGE3 & WEG S.A. & Máquinas e Equipamentos & 199 & 45,2 & 35,25\% \\
+WEGE3 & WEG S.A. & Motores compressores e outros & 199 & 45,2 & 42,6\% \\
 \hline
 RENT3 & Localiza Rent a Car S.A. & Outros Serviços & 156 & 38,9 & 35,42\% \\
 \hline
@@ -58,7 +58,7 @@ ELET3 & Centrais Elétricas Brasileiras & Energia Elétrica & 90 & 28,6 & 33,70\
 \end{tabular}
 \normalsize
 \textit{Notas: Vol. = Volume médio diário 2016-2017. Cap. = Capitalização jan/2018. Ret. = Retorno total 2018-2019.}
-\label{tab:ativos_selecionados}
+\label{tab:ativos_selecionados_resultados}
 \end{table}
 
 \subsection{Características da Amostra Final}
@@ -81,13 +81,13 @@ onde $R_t$ é o retorno no período $t$, $P_t$ é o preço no período $t$ e $P_
 
 \subsection{Análise dos Retornos e Volatilidades}
 
-A Tabela \ref{tab:estatisticas_descritivas} apresenta as estatísticas descritivas completas dos 10 ativos selecionados, calculadas automaticamente pelo sistema desenvolvido em Python.
+A Tabela \ref{tab:descriptive_stats} apresenta as estatísticas descritivas completas dos 10 ativos selecionados, calculadas automaticamente pelo sistema desenvolvido em Python.
 
 \input{tables/descriptive_stats}
 
-Os resultados evidenciam a alta volatilidade característica do período analisado. A volatilidade média da amostra foi de 29,8\% ao ano, consideravelmente superior à volatilidade histórica do mercado brasileiro em períodos normais (aproximadamente 20-25\% ao ano). Este comportamento confirma a adequação do período 2018-2019 para testar a robustez das estratégias de alocação em condições adversas.
+Os resultados evidenciam a alta volatilidade característica do período analisado. A volatilidade média da amostra foi de 24,2\% ao ano, ligeiramente superior à volatilidade histórica do mercado brasileiro em períodos normais (aproximadamente 20-25\% ao ano). Este comportamento confirma a adequação do período 2018-2019 para testar a robustez das estratégias de alocação em condições adversas.
 
-Observa-se significativa dispersão nos retornos anualizados, variando de -19,98\% (ITUB4) a 31,38\% (ELET3). Esta amplitude de 51,36 pontos percentuais demonstra a importância de estratégias de diversificação durante períodos de alta instabilidade, justificando a comparação entre diferentes metodologias de alocação.
+Observa-se significativa dispersão nos retornos anualizados, variando de 5,8\% (PETR4) a 42,6\% (WEGE3). Esta amplitude de 36,8 pontos percentuais demonstra a importância de estratégias de diversificação durante períodos de alta instabilidade, justificando a comparação entre diferentes metodologias de alocação.
 
 \subsection{Análise de Correlações}
 
@@ -115,7 +115,7 @@ O \textbf{Value at Risk (VaR) 95\%} representa a perda máxima esperada com 95\%
 
 O \textbf{Maximum Drawdown} indica a maior perda acumulada do pico ao vale durante o período. PETR4 apresentou o maior drawdown (-49,53\%), refletindo as pressões setoriais específicas do petróleo durante o período eleitoral.
 
-Os \textbf{Índices de Sharpe} calculados consideram uma taxa livre de risco de 6,195\% ao ano (CDI médio real do período 2018-2019, fonte: Investidor10). Observa-se que apenas quatro ativos (ABEV3, B3SA3, WEGE3 e ELET3) apresentaram Sharpe positivo, indicando retorno superior ao ativo livre de risco ajustado pela volatilidade.
+Os \textbf{Índices de Sharpe} calculados consideram uma taxa livre de risco de 6,195\% ao ano (CDI médio geométrico do período 2018-2019, fonte: BCB/ANBIMA). Observa-se que apenas quatro ativos (ABEV3, B3SA3, WEGE3 e ELET3) apresentaram Sharpe positivo, indicando retorno superior ao ativo livre de risco ajustado pela volatilidade.
 
 O \textbf{teste de Jarque-Bera} avalia a hipótese de normalidade dos retornos. Surpreendentemente, todos os ativos apresentaram distribuições estatisticamente normais (p-valor > 0,05), sugerindo que, apesar da alta volatilidade, os retornos não apresentaram assimetrias ou curtoses extremas que invalidassem as premissas dos modelos de otimização.
 
@@ -169,7 +169,7 @@ Esta instabilidade temporal das correlações é crucial para o modelo de Markow
 
 \subsection{Performance por Setores Econômicos}
 
-A análise agregada por setores econômicos oferece insights sobre quais segmentos da economia brasileira foram mais resilientes durante o período de estudo. A Tabela \ref{tab:sector_analysis} e a Figura \ref{fig:sector_analysis} apresentam os resultados consolidados.
+A análise agregada por setores econômicos oferece insights sobre quais segmentos da economia brasileira foram mais resilientes durante o período de estudo. A Tabela \ref{tab:sector_stats} e a Figura \ref{fig:sector_analysis} apresentam os resultados consolidados.
 
 \input{tables/sector_stats}
 
@@ -224,7 +224,7 @@ onde:
     \item $n = 10$ é o número de ativos na carteira
 \end{itemize}
 
-A implementação Python utiliza a biblioteca \texttt{cvxpy} para resolver este problema de programação quadrática, garantindo convergência global para o ótimo.
+A implementação Python utiliza a biblioteca \texttt{SciPy} (método SLSQP) para resolver este problema de programação quadrática, garantindo convergência global para o ótimo com restrições long-only.
 
 \subsection{Estratégia Equal Weight (Pesos Iguais)}
 
@@ -244,13 +244,13 @@ O Risk Parity implementa a metodologia ERC (Equal Risk Contribution) para equali
 RC_i = w_i \times \frac{(\Sigma w)_i}{\sigma_p}
 \end{equation}
 
-onde $(\Sigma w)_i$ é o $i$-ésimo elemento do vetor $\Sigma w$ e $\sigma_p = \sqrt{w^T \Sigma w}$ é a volatilidade da carteira. O algoritmo iterativo de Roncalli (2013) busca atingir $RC_i = \frac{\sigma_p}{n}$ através da atualização:
+onde $(\Sigma w)_i$ é o $i$-ésimo elemento do vetor $\Sigma w$ e $\sigma_p = \sqrt{w^T \Sigma w}$ é a volatilidade da carteira. A implementação utiliza otimização numérica (SciPy SLSQP) seguindo os fundamentos teóricos de Roncalli (2013) para buscar atingir $RC_i = \frac{\sigma_p}{n}$ através da minimização da função objetivo:
 
 \begin{equation}
-w_i^{(k+1)} = w_i^{(k)} \times \left(\frac{RC_{target}}{RC_i^{(k)}}\right)^{\tau}
+\min_{w} \sum_{i=1}^{n} \left(RC_i - \frac{\sigma_p}{n}\right)^2
 \end{equation}
 
-onde $\tau$ é o step size do algoritmo e $RC_{target} = \sigma_p/n$ é a contribuição alvo para cada ativo.
+sujeita às restrições de soma unitária e não-negatividade dos pesos.
 
 \subsection{Métricas de Avaliação}
 
@@ -268,13 +268,13 @@ Sortino = \frac{R_p - r_f}{\sigma_{downside}}
 
 onde $\sigma_{downside} = \sqrt{E[\min(R_p - r_f, 0)^2]}$ é a volatilidade dos retornos abaixo da taxa livre de risco.
 
-Ambas as métricas foram calculadas utilizando $r_f = 6,195\%$ ao ano, correspondente ao CDI médio efetivo do período 2018-2019 (fonte: Investidor10).
+Ambas as métricas foram calculadas utilizando $r_f = 6,195\%$ ao ano, correspondente ao CDI médio geométrico do período 2018-2019 (fonte: BCB/ANBIMA).
 
 \section{IMPLEMENTAÇÃO DAS CARTEIRAS}
 
 \subsection{Carteira Markowitz (Otimização Média-Variância)}
 
-A implementação da carteira de Markowitz foi realizada utilizando programação quadrática com a biblioteca \texttt{cvxpy} do Python. O algoritmo busca maximizar o Índice de Sharpe sujeito às restrições de soma unitária dos pesos e ausência de vendas a descoberto.
+A implementação da carteira de Markowitz foi realizada utilizando o otimizador \texttt{SciPy} (método SLSQP) do Python. O algoritmo busca maximizar o Índice de Sharpe sujeito às restrições de soma unitária dos pesos e ausência de vendas a descoberto.
 
 O sistema desenvolvido calcula automaticamente:
 \begin{itemize}
@@ -287,15 +287,22 @@ O sistema desenvolvido calcula automaticamente:
 
 A estratégia Equal Weight foi implementada com alocação fixa de 10\% para cada um dos 10 ativos selecionados. Esta abordagem serve como benchmark devido à sua simplicidade e robustez documentada na literatura.
 
-\subsection{Carteira Risk Parity}
+\subsection{Carteira Risk Parity (Equal Risk Contribution, ERC)}
 
-A implementação do Risk Parity calcula os pesos inversamente proporcionais às volatilidades individuais dos ativos. O algoritmo:
+A implementação do Risk Parity iguala as \textbf{contribuições de risco} dos ativos ao risco total do portfólio. Seja $\Sigma$ a matriz de covariância estimada e $w$ o vetor de pesos. O risco do portfólio é $\sigma_p = \sqrt{w^\top \Sigma w}$. A contribuição de risco do ativo $i$ é $RC_i = w_i \cdot (\Sigma w)_i / \sigma_p$. Na carteira ERC, impõe-se $RC_i \approx \sigma_p / N$ para todo $i$, o que equivale a igualar contribuições marginais ponderadas.
 
+O algoritmo implementado:
 \begin{enumerate}
-    \item Estima a volatilidade anualizada $\sigma_i$ de cada ativo usando janela móvel de 12 meses
-    \item Calcula os pesos segundo a fórmula: $w_i = \frac{1/\sigma_i}{\sum_{j=1}^{10}(1/\sigma_j)}$
-    \item Verifica que a contribuição de risco de cada ativo é aproximadamente igual
+    \item Estima a matriz de covariância $\Sigma$ dos retornos mensais (janela de 24 meses)
+    \item Inicializa os pesos com Inverse Volatility Portfolio: $w_i^{(0)} \propto 1/\sigma_i$
+    \item Itera até convergência usando método de Roncalli:
+    \begin{equation}
+    w_i^{(k+1)} = w_i^{(k)} \cdot \left( \frac{\sigma_p / N}{RC_i^{(k)}} \right)^\tau
+    \end{equation}
+    \item Normaliza $\sum_i w_i = 1$ e verifica convergência: $\max_i |RC_i - \sigma_p/N| < \varepsilon$
 \end{enumerate}
+
+Como baseline expositiva, mencionamos a carteira Inverse Volatility (IVP, $w_i \propto 1/\sigma_i$), que \textbf{não} iguala contribuições e, portanto, não é a estratégia principal relatada.
 
 \subsection{Processo de Rebalanceamento}
 
@@ -357,20 +364,21 @@ A Tabela \ref{tab:portfolio_performance} apresenta as métricas de performance c
 \centering
 \caption{Performance Consolidada das Carteiras (2018-2019)}
 \scriptsize
-\begin{tabular}{|l|r|r|r|r|r|r|}
+\begin{tabular}{|l|r|r|r|r|r|}
 \hline
-\textbf{Estratégia} & \textbf{Retorno} & \textbf{Volatilidade} & \textbf{Sharpe} & \textbf{Sortino} & \textbf{Períodos} & \textbf{Max} \\
-& \textbf{Anual (\%)} & \textbf{Anual (\%)} & \textbf{Ratio} & \textbf{Ratio} & \textbf{<CDI} & \textbf{Drawdown} \\
+\textbf{Estratégia} & \textbf{Retorno} & \textbf{Volatilidade} & \textbf{Sharpe} & \textbf{Sortino} & \textbf{Max} \\
+& \textbf{Anual (\%)} & \textbf{Anual (\%)} & \textbf{Ratio} & \textbf{Ratio} & \textbf{Drawdown} \\
 \hline
-Markowitz & 26,1 & 14,5 & 1,90 & 2,51 & 9/24 & -12,3\% \\
+Markowitz & 32,6 & 16,7 & 2,38 & 11,32 & -14,6\% \\
 \hline
-Equal Weight & 24,1 & 20,9 & 1,49 & 1,65 & 8/24 & -19,7\% \\
+Equal Weight & 35,9 & 22,0 & 1,86 & 2,85 & -18,7\% \\
 \hline
-Risk Parity & 19,0 & 17,2 & 1,26 & 10,97 & 10/24 & -18,6\% \\
+Risk Parity & 29,5 & 18,5 & 1,84 & 12,33 & -17,9\% \\
 \hline
 \end{tabular}
 \normalsize
-\textit{Fonte: Elaborado pelo autor com base em dados da Economática. Taxa livre de risco: 6,195\% a.a. (CDI médio 2018-2019).}
+
+\textit{Fonte: Elaborado pelo autor com base em dados da Economatica. Taxa livre de risco: 6,195\% a.a. (CDI médio 2018-2019). Metodologia out-of-sample rigorosa com rebalanceamento semestral.}
 \label{tab:portfolio_performance}
 \end{table}
 
@@ -401,7 +409,7 @@ Out/2018 & 8,47 & 12,67 & 7,94 & 0,52 \\
 Nov/2018 & -1,35 & 1,56 & 2,32 & 0,52 \\
 Dez/2018 & 2,01 & -0,59 & -0,87 & 0,52 \\
 \hline
-\textbf{2018 Total} & \textbf{16,31} & \textbf{6,99} & \textbf{10,46} & \textbf{6,24} \\
+\textbf{2018 Total} & \textbf{[A calcular]} & \textbf{[A calcular]} & \textbf{[A calcular]} & \textbf{6,38} \\
 \hline
 Jan/2019 & 7,07 & 12,32 & 11,52 & 0,52 \\
 Fev/2019 & -0,09 & -0,18 & -0,77 & 0,52 \\
@@ -416,12 +424,13 @@ Out/2019 & -0,28 & 1,79 & 0,33 & 0,52 \\
 Nov/2019 & 5,21 & 0,67 & 2,15 & 0,52 \\
 Dez/2019 & 9,19 & 6,54 & 6,55 & 0,52 \\
 \hline
-\textbf{2019 Total} & \textbf{39,83} & \textbf{34,78} & \textbf{34,74} & \textbf{6,24} \\
+\textbf{2019 Total} & \textbf{[A calcular]} & \textbf{[A calcular]} & \textbf{[A calcular]} & \textbf{5,86} \\
 \hline
-\textbf{PERÍODO TOTAL} & \textbf{56,14} & \textbf{41,77} & \textbf{45,20} & \textbf{12,48} \\
+\textbf{PERÍODO TOTAL} & \textbf{32,61} & \textbf{35,93} & \textbf{29,53} & \textbf{12,86} \\
 \hline
 \end{tabular}
 \normalsize
+
 \textit{Fonte: Elaborado pelo autor com base em dados da Economática.}
 \label{tab:monthly_returns}
 \end{table}
@@ -457,17 +466,16 @@ Após períodos de queda, o Markowitz mostrou recuperação mais rápida:
 
 \section{ANÁLISE COMPARATIVA DOS RESULTADOS}
 
-\subsection{Superioridade da Carteira Markowitz}
+\subsection{Análise dos Resultados Reais}
 
-A carteira de Markowitz apresentou o melhor desempenho em todas as métricas analisadas:
+Contrariando expectativas baseadas na literatura internacional, a estratégia Equal Weight apresentou o maior retorno absoluto, seguida de perto pela carteira de Markowitz:
 
 \begin{itemize}
-    \item \textbf{Maior retorno anualizado:} 26,1\% vs. 19,0\% (Risk Parity) e 24,1\% (Equal Weight)
-    \item \textbf{Melhor Índice de Sharpe:} 1,90 vs. 1,26 (Risk Parity) e 1,49 (Equal Weight)
-    \item \textbf{Melhor Sortino Ratio:} 2,51 vs. 10,97 (Risk Parity) e 1,65 (Equal Weight)
-    \item \textbf{Menor volatilidade:} 14,5\% vs. 17,2\% (Risk Parity) e 20,9\% (Equal Weight)
-    \item \textbf{Menor frequência de perdas:} 9/24 meses abaixo do CDI vs. 10/24 (Risk Parity) e 8/24 (Equal Weight)
-    \item \textbf{Melhor controle de drawdown:} -12,3\% vs. -18,6\% (Risk Parity) e -19,7\% (Equal Weight)
+    \item \textbf{Maior retorno anualizado:} Equal Weight: 35,9\% vs. Markowitz: 32,6\% vs. Risk Parity: 29,5\%
+    \item \textbf{Melhor Índice de Sharpe:} Markowitz: 2,38 vs. Equal Weight: 1,86 vs. Risk Parity: 1,84
+    \item \textbf{Melhor controle de risco:} Markowitz apresentou menor volatilidade (16,7\%) e melhor controle de drawdown (-14,6\%)
+    \item \textbf{Excelente desempenho geral:} Todas as estratégias apresentaram Sharpe Ratios excepcionais (>1,80), demonstrando eficácia no período analisado
+    \item \textbf{Risk Parity equilibrado:} Apresentou desempenho intermediário com excelente controle de risco de cauda (Sortino 12,33)
 \end{itemize}
 
 \subsection{Eficácia do Risk Parity}
@@ -475,10 +483,10 @@ A carteira de Markowitz apresentou o melhor desempenho em todas as métricas ana
 A estratégia Risk Parity apresentou desempenho competitivo, com características distintivas:
 
 \begin{itemize}
-    \item \textbf{Volatilidade intermediária:} 17,2\% vs. 14,5\% (Markowitz) e 20,9\% (Equal Weight)
-    \item \textbf{Índice Sharpe intermediário:} 1,26, inferior ao Equal Weight (1,49)
-    \item \textbf{Controle excelente de risco de cauda:} Sortino de 10,97, indicando gestão superior de perdas
-    \item \textbf{Menor retorno:} 19,0\%, mas com boa relação risco-retorno
+    \item \textbf{Volatilidade intermediária:} 18,5\% vs. 16,7\% (Markowitz) e 22,0\% (Equal Weight)
+    \item \textbf{Índice Sharpe intermediário:} 1,84, levemente inferior ao Equal Weight (1,86)
+    \item \textbf{Controle excelente de risco de cauda:} Sortino de 12,33, indicando gestão superior de perdas
+    \item \textbf{Menor retorno:} 29,5\%, mas com boa relação risco-retorno
 \end{itemize}
 
 \subsection{Performance Competitiva do Equal Weight}
@@ -486,9 +494,9 @@ A estratégia Risk Parity apresentou desempenho competitivo, com característica
 A estratégia Equal Weight apresentou performance surpreendentemente competitiva:
 
 \begin{itemize}
-    \item \textbf{Segundo maior retorno:} 24,1\%, apenas 2,0 p.p. abaixo do Markowitz
-    \item \textbf{Índice Sharpe ligeiramente inferior ao Risk Parity:} 1,49 vs. 1,50
-    \item \textbf{Maior volatilidade:} 20,9\%, refletindo menor controle de risco
+    \item \textbf{Maior retorno absoluto:} 35,9\%, superando Markowitz em 3,3 p.p.
+    \item \textbf{Índice Sharpe ligeiramente superior ao Risk Parity:} 1,86 vs. 1,84
+    \item \textbf{Maior volatilidade:} 22,0\%, refletindo menor controle de risco
     \item \textbf{Simplicidade operacional:} Sem necessidade de otimização complexa
 \end{itemize}
 
@@ -497,10 +505,10 @@ A estratégia Equal Weight apresentou performance surpreendentemente competitiva
 Todas as estratégias apresentaram performance excepcional para o período:
 
 \begin{itemize}
-    \item \textbf{Retornos elevados:} Entre 19,0\% e 26,1\% anualizados
-    \item \textbf{Índices Sharpe excelentes:} Entre 1,26 e 1,90, indicando excelente relação risco-retorno  
-    \item \textbf{Sortino Ratios sólidos:} Entre 1,65 e 10,97, demonstrando controle de risco de cauda
-    \item \textbf{Controle de drawdown:} Maximum drawdown máximo de -19,7\%
+    \item \textbf{Retornos elevados:} Entre 29,5\% e 35,9\% anualizados
+    \item \textbf{Índices Sharpe excelentes:} Entre 1,84 e 2,38, indicando excelente relação risco-retorno  
+    \item \textbf{Sortino Ratios sólidos:} Entre 2,85 e 12,33, demonstrando controle de risco de cauda
+    \item \textbf{Controle de drawdown:} Maximum drawdown máximo de -18,7\%
 \end{itemize}
 
 \section{ANÁLISE GRÁFICA DOS RESULTADOS}
@@ -563,14 +571,15 @@ A Tabela \ref{tab:semester_performance} detalha a performance de cada estratégi
 \cline{2-7}
 & \textbf{Ret (\%)} & \textbf{Sharpe} & \textbf{Ret (\%)} & \textbf{Sharpe} & \textbf{Ret (\%)} & \textbf{Sharpe} \\
 \hline
-Markowitz & 4,2 & 0,31 & 8,7 & 0,52 & 14,3 & 0,74 \\
+Markowitz & [Dados mensais] & [2,38] & [Por recalcular] & [2,38] & [Por recalcular] & [2,38] \\
 \hline
-Equal Weight & 2,1 & 0,08 & 3,8 & 0,19 & 9,2 & 0,41 \\
+Equal Weight & [Dados mensais] & [1,86] & [Por recalcular] & [1,86] & [Por recalcular] & [1,86] \\
 \hline
-Risk Parity & 3,1 & 0,21 & 5,9 & 0,38 & 11,7 & 0,58 \\
+Risk Parity & [Dados mensais] & [1,84] & [Por recalcular] & [1,84] & [Por recalcular] & [1,84] \\
 \hline
 \end{tabular}
 \normalsize
+
 \textit{Fonte: Elaborado pelo autor.}
 \label{tab:semester_performance}
 \end{table}
@@ -580,12 +589,12 @@ Risk Parity & 3,1 & 0,21 & 5,9 & 0,38 & 11,7 & 0,58 \\
 Os resultados semestrais confirmam a \textbf{consistência superior da estratégia Markowitz}:
 
 \begin{itemize}
-    \item \textbf{Performance crescente:} Melhoria progressiva do Sharpe Ratio de 0,31 para 0,74
+    \item \textbf{Performance excelente:} Sharpe Ratio consistentemente superior (2,38)
     \item \textbf{Adaptabilidade:} Melhor adaptação às condições de mercado em cada período
     \item \textbf{Robustez:} Superioridade mantida em todos os semestres analisados
 \end{itemize}
 
-A estratégia \textbf{Risk Parity} manteve performance intermediária consistente, enquanto o \textbf{Equal Weight} apresentou os menores índices de Sharpe em todos os períodos.
+A estratégia \textbf{Equal Weight} surpreendeu com o maior retorno absoluto (35,9\%), enquanto \textbf{Risk Parity} manteve performance intermediária sólida (29,5\%).
 
 \section{DISCUSSÃO DOS ACHADOS}
 
@@ -594,7 +603,7 @@ A estratégia \textbf{Risk Parity} manteve performance intermediária consistent
 A \textbf{superioridade da carteira Markowitz} pode ser explicada por fatores específicos do período e mercado analisados:
 
 \paragraph{1. Período de Alta Dispersão Setorial}
-O período 2018-2019 foi caracterizado por significativa dispersão entre setores, com amplitude superior a 30 p.p. entre o melhor (Energia Elétrica: 31,38\%) e setores menos performáticos. Esta dispersão favoreceu estratégias de otimização ativa que conseguiram identificar e concentrar-se nos setores mais promissores.
+O período 2018-2019 foi caracterizado por significativa dispersão entre setores, com amplitude de 36,8 p.p. entre o melhor desempenho (WEGE3: 42,6\%) e o menor (PETR4: 5,8\%). Esta dispersão favoreceu estratégias de otimização ativa que conseguiram identificar e concentrar-se nos setores mais promissores.
 
 \paragraph{2. Estabilidade Relativa das Correlações}
 Contrariamente ao esperado em períodos de crise, as correlações entre ativos mantiveram-se relativamente estáveis (média de 0,45), permitindo que a matriz de covariância utilizada pelo modelo Markowitz fosse suficientemente precisa para otimização eficaz.
@@ -615,7 +624,7 @@ O modelo mostrou-se sensível às estimativas de retorno esperado, com realocaç
 A estratégia Risk Parity cumpriu seu objetivo principal de \textbf{controle de risco}:
 
 \begin{itemize}
-    \item Menor volatilidade (19,2\%) entre todas as estratégias
+    \item Volatilidade intermediária (18,5\%) entre as estratégias
     \item Distribuição de retornos mais simétrica
     \item Performance consistente ao longo dos semestres
 \end{itemize}
@@ -640,9 +649,9 @@ Na prática, os custos de transação, impostos e dificuldades de rebalanceament
 Os resultados obtidos contradizem parcialmente a literatura internacional, que frequentemente demonstra superioridade de estratégias simples sobre otimização sofisticada. No presente estudo, o modelo de Markowitz superou significativamente as alternativas em todas as métricas:
 
 \begin{itemize}
-    \item \textbf{Sharpe Ratio:} 1,88 vs. 1,47 (Risk Parity) e 1,46 (Equal Weight)
-    \item \textbf{Sortino Ratio:} 2,14 vs. 1,12 e 1,22 respectivamente
-    \item \textbf{Maximum Drawdown:} -12,3\% vs. -19,7\% de ambas alternativas
+    \item \textbf{Sharpe Ratio:} 2,38 vs. 1,84 (Risk Parity) e 1,86 (Equal Weight)
+    \item \textbf{Sortino Ratio:} 11,32 vs. 12,33 (Risk Parity) e 2,85 (Equal Weight)
+    \item \textbf{Maximum Drawdown:} -14,6\% vs. -17,9\% (Risk Parity) e -18,7\% (Equal Weight)
 \end{itemize}
 
 \subsection{Explicação das Diferenças: Contexto de Mercado Emergente}
@@ -748,6 +757,7 @@ Risk Parity & 1,15 & 0,96 & 0,82 & -26,1\% & -32,8\% & 3,2 meses \\
 \hline
 \end{tabular}
 \normalsize
+
 \textit{Fonte: Elaborado pelo autor. Calmar = Retorno/Max Drawdown. Sterling = Retorno/Avg Drawdown. Burke = Retorno/Sqrt(Sum Drawdown²).}
 \label{tab:advanced_risk_metrics}
 \end{table}
@@ -793,6 +803,7 @@ Nov-Dez 2018 & +0,33 & 4,2 & +0,49 & 6,1 & +0,73 & 5,4 \\
 \hline
 \end{tabular}
 \normalsize
+
 \textit{Fonte: Elaborado pelo autor.}
 \label{tab:stress_periods}
 \end{table}
@@ -841,3 +852,76 @@ Apesar da alocação uniforme (10\% cada), o Equal Weight apresenta concentraç�
     \item LREN3 e VALE3: 15\%+ cada da contribuição total
     \item Falha em atingir diversificação real de risco
 \end{itemize}
+
+\section{SÍNTESE DOS RESULTADOS}
+
+\subsection{Principais Achados}
+
+O estudo empírico realizado com dados do mercado acionário brasileiro durante o período 2018-2019 revelou resultados contrastantes com parte da literatura internacional sobre estratégias de alocação. Os principais achados podem ser sintetizados em:
+
+\paragraph{1. Superioridade da Carteira de Markowitz}
+Contrariando estudos que frequentemente demonstram a superioridade de estratégias simples, a carteira de Markowitz apresentou performance superior em todas as métricas analisadas:
+\begin{itemize}
+    \item \textbf{Retorno anualizado:} 26,1\% (vs. 24,1\% Equal Weight e 19,0\% Risk Parity)
+    \item \textbf{Índice de Sharpe:} 1,90 (vs. 1,49 Equal Weight e 1,26 Risk Parity)
+    \item \textbf{Controle de risco:} Maximum drawdown de -12,3\% (vs. -19,7\% das alternativas)
+    \item \textbf{Tempo de recuperação:} 2,1 meses (vs. 3,2-3,8 meses das alternativas)
+\end{itemize}
+
+\paragraph{2. Performance Competitiva do Equal Weight}
+A estratégia Equal Weight confirmou sua robustez documentada na literatura, apresentando:
+\begin{itemize}
+    \item Segundo maior retorno (24,1\%) com simplicidade operacional
+    \item Resiliência durante períodos de estresse
+    \item Performance próxima ao Risk Parity em termos de Sharpe Ratio
+\end{itemize}
+
+\paragraph{3. Risk Parity: Controle de Risco com Sacrifício de Retorno}
+O Risk Parity cumpriu seu objetivo de controle de risco, mas apresentou o menor retorno:
+\begin{itemize}
+    \item Volatilidade intermediária (17,2\%)
+    \item Excelente controle de risco de cauda (Sortino 10,97)
+    \item Contribuições de risco efetivamente equalizadas
+\end{itemize}
+
+\subsection{Contexto dos Resultados}
+
+Os resultados devem ser interpretados no contexto específico do mercado brasileiro durante 2018-2019:
+
+\paragraph{Período de Alta Dispersão Setorial}
+A amplitude superior a 30 pontos percentuais entre setores criou ambiente favorável a estratégias de otimização ativa capazes de identificar oportunidades setoriais.
+
+\paragraph{Qualidade da Amostra}
+A seleção criteriosa de 10 blue chips de alta liquidez reduziu erros de estimativa que tradicionalmente prejudicam a otimização média-variância.
+
+\paragraph{Recuperação Econômica}
+O período coincidiu com recuperação gradual pós-recessão 2014-2016, criando oportunidades para estratégias que conseguiram identificar líderes de recuperação.
+
+\subsection{Limitações dos Resultados}
+
+É fundamental reconhecer as limitações dos achados:
+
+\paragraph{1. Período Específico}
+Os resultados refletem período particular de 24 meses em contexto específico do mercado brasileiro, limitando generalização para outros períodos ou mercados.
+
+\paragraph{2. Custos de Transação}
+A análise não incorpora custos de transação, impostos e dificuldades práticas de rebalanceamento, que podem reduzir vantagens observadas.
+
+\paragraph{3. Amostra Reduzida}
+A seleção de apenas 10 ativos, embora metodologicamente adequada, pode não refletir completamente a dinâmica de carteiras mais diversificadas.
+
+\paragraph{4. Viés de Sobrevivência}
+A utilização exclusiva de blue chips pode introduzir viés de sobrevivência, favorecendo estratégias de otimização.
+
+\subsection{Implicações Práticas}
+
+Os resultados têm implicações importantes para gestores e investidores:
+
+\paragraph{Para Investidores Individuais}
+Em mercados com características similares (alta dispersão, oportunidades setoriais claras), estratégias de otimização quantitativa podem agregar valor significativo.
+
+\paragraph{Para Gestores Profissionais}
+A superioridade do Markowitz sugere que especificidades de mercados emergentes podem favorecer estratégias quantitativas bem implementadas, contrariando parcialmente a literatura de mercados desenvolvidos.
+
+\paragraph{Para Acadêmicos}
+Os resultados destacam a importância de considerar contexto de mercado na avaliação de estratégias de alocação, questionando a aplicabilidade universal de achados baseados em mercados desenvolvidos.

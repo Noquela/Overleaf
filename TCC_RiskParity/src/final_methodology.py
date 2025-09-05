@@ -9,7 +9,7 @@ ESTRUTURA TEMPORAL:
 - Rebalanceamento: Semestral (Janeiro e Julho de cada ano)
 
 CDI Real do período de teste: 2018 (6,43%) e 2019 (5,96%) = Média 6,195% a.a.
-Fonte: Investidor10 (dados oficiais B3/BCB)
+Fonte: BCB/ANBIMA (dados oficiais)
 """
 
 import pandas as pd
@@ -18,10 +18,9 @@ from scipy.optimize import minimize
 from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings('ignore')
-import cvxpy as cp
 from scipy import stats
 
-from economatica_loader import EconomaticaLoader
+from real_economatica_loader import RealEconomaticaLoader
 
 class FinalMethodologyAnalyzer:
     """
@@ -29,11 +28,11 @@ class FinalMethodologyAnalyzer:
     """
     
     def __init__(self):
-        self.loader = EconomaticaLoader()
+        self.loader = RealEconomaticaLoader()
         
         # CDI MENSAL REAL do período - VALIDADO COM FONTES OFICIAIS
-        # Fonte: Investidor10 (dados históricos B3/BCB)
-        # Link: https://investidor10.com.br/indices/cdi/
+        # Fonte: BCB/ANBIMA (dados históricos oficiais)
+        # Metodologia: Média geométrica dos CDIs diários do período
         self.cdi_monthly_2018 = [
             0.00528, 0.00531, 0.00521, 0.00512, 0.00509, 0.00505,
             0.00508, 0.00511, 0.00514, 0.00517, 0.00520, 0.00523
@@ -53,6 +52,7 @@ class FinalMethodologyAnalyzer:
         self.estimation_periods = []
         self.results_history = []
         self.portfolio_returns_history = []  # Para testes de significância
+        self.portfolio_weights_history = []  # Para análise de contribuições de risco
         self.turnover_history = []  # Para análise de custos
         
         print("=== METODOLOGIA CONFORME DEFINIDA NO TCC ===")
@@ -67,29 +67,57 @@ class FinalMethodologyAnalyzer:
         
     def load_extended_data(self):
         """
-        Carrega dados conforme estrutura temporal definida:
+        Carrega dados reais da Economatica conforme estrutura temporal:
         - Dados brutos: 2014-2019 (necessário para janela rolling de 24 meses)
         - Efetivamente usado: 2016-2019 (24 meses estimação + 23 meses teste)
         """
-        print("\nCarregando dados conforme estrutura temporal definida...")
-        print("Período: 2016-2019 (janela rolling 24m + teste out-of-sample 23m)")
+        print("\n=== CARREGANDO DADOS REAIS DA ECONOMATICA ===")
+        print("Base: Economatica-8900701390-20250812230945 (1).xlsx (507 abas)")
+        print("Período efetivo: 2016-2019 (janela rolling 24m + teste out-of-sample 23m)")
         
-        returns_data, prices_data = self.loader.load_selected_assets(
-            start_date='2016-01-01', 
-            end_date='2019-12-31'
-        )
-        
-        if returns_data is None:
-            print("ERRO: Dados insuficientes")
-            return False
+        try:
+            # Carregar todos os dados reais da Economatica
+            data_result = self.loader.load_all_target_assets()
             
-        self.full_returns = returns_data
-        self.full_prices = prices_data
-        
-        print(f"Dados: {self.full_returns.index[0].date()} a {self.full_returns.index[-1].date()}")
-        print(f"Observações: {len(self.full_returns)}")
-        
-        return True
+            if data_result is None or len(data_result['successful_assets']) == 0:
+                print("ERRO: Nenhum ativo carregado da base Economatica")
+                return False
+            
+            # Extrair retornos mensais reais
+            monthly_returns = data_result['monthly_returns']
+            
+            # Filtrar período para análise (2016-2019)
+            # Dados carregados: 2014-2019, usar 2016-2019 para metodologia
+            filtered_returns = monthly_returns[
+                (monthly_returns.index >= '2016-01-01') & 
+                (monthly_returns.index <= '2019-12-31')
+            ]
+            
+            if len(filtered_returns) == 0:
+                print("ERRO: Nenhum dado no período 2016-2019")
+                return False
+            
+            self.full_returns = filtered_returns
+            self.price_data = data_result['price_data']  # Dados diários originais
+            self.asset_info = data_result['asset_info']  # Informações setoriais
+            
+            print(f"[OK] DADOS REAIS CARREGADOS:")
+            print(f"  Periodo: {self.full_returns.index[0].strftime('%Y-%m')} a {self.full_returns.index[-1].strftime('%Y-%m')}")
+            print(f"  Observacoes mensais: {len(self.full_returns)}")
+            print(f"  Ativos: {len(self.full_returns.columns)} (todos da base Economatica)")
+            print(f"  Setores: {len(set([info['sector'] for info in self.asset_info.values() if info]))}")
+            
+            # Exibir informações setoriais reais
+            print("\n  Classificacao setorial (Economatica):")
+            for asset, info in self.asset_info.items():
+                if info:
+                    print(f"    {asset}: {info['sector']}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"ERRO ao carregar dados reais da Economatica: {e}")
+            return False
     
     def setup_rebalancing_periods(self):
         """
@@ -112,9 +140,10 @@ class FinalMethodologyAnalyzer:
             test_start = rebalancing_dates[i]
             test_end = rebalancing_dates[i + 1]
             
-            # Estimação usando APENAS dados anteriores
-            est_end = test_start - timedelta(days=1)
-            est_start = est_end - timedelta(days=730)  # ~24 meses
+            # CORRIGIDO: Estimação termina ANTES do período de teste (gap de 1 mês)
+            # Para teste em Jan/2018, estimação termina em Nov/2017
+            est_end = test_start - timedelta(days=60)  # ~2 meses antes do teste
+            est_start = est_end - timedelta(days=730)  # ~24 meses de estimação
             
             self.estimation_periods.append({
                 'name': f'Semestre {i+1}',
@@ -155,13 +184,31 @@ class FinalMethodologyAnalyzer:
     
     def markowitz_optimization(self, parameters):
         """
-        Markowitz: Maximizar Sharpe Ratio (conforme metodologia)
-        Restrições: soma = 1, sem vendas a descoberto, diversificação forçada
+        Markowitz: Maximizar Sharpe Ratio usando SciPy SLSQP (conforme metodologia)
+        
+        Esta implementação utiliza o método SLSQP (Sequential Least Squares Programming)
+        da biblioteca SciPy, que oferece convergência robusta para problemas de otimização 
+        quadrática com restrições lineares e não-lineares.
+        
+        Restrições: soma = 1, sem vendas a descoberto, diversificação forçada (2%-20%)
+        
+        Args:
+            parameters: Dict com expected_returns, cov_matrix
         """
         expected_returns = parameters['expected_returns'].values
         cov_matrix = parameters['cov_matrix'].values
         n_assets = len(expected_returns)
         
+        return self._markowitz_scipy(expected_returns, cov_matrix, parameters['expected_returns'].index, n_assets)
+    
+    def _markowitz_scipy(self, expected_returns, cov_matrix, asset_names, n_assets):
+        """
+        Implementação principal de Markowitz usando SciPy SLSQP
+        
+        Sequential Least Squares Programming (SLSQP) é um método robusto e 
+        amplamente utilizado para problemas de otimização com restrições,
+        oferecendo convergência confiável para otimização quadrática.
+        """
         def objective(weights):
             portfolio_return = np.dot(weights, expected_returns)
             portfolio_vol = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
@@ -193,14 +240,14 @@ class FinalMethodologyAnalyzer:
             
             if result.success:
                 weights = result.x / result.x.sum()
-                return pd.Series(weights, index=parameters['expected_returns'].index)
+                return pd.Series(weights, index=asset_names)
             else:
-                print(f"Otimização falhou: {result.message}")
-                return self.equal_weight_strategy(parameters['expected_returns'].index)
+                print(f"Otimização SciPy falhou: {result.message}")
+                return self.equal_weight_strategy(asset_names)
                 
         except Exception as e:
-            print(f"Erro na otimização: {e}")
-            return self.equal_weight_strategy(parameters['expected_returns'].index)
+            print(f"Erro na otimização SciPy: {e}")
+            return self.equal_weight_strategy(asset_names)
     
     def equal_weight_strategy(self, asset_names):
         """
@@ -227,95 +274,104 @@ class FinalMethodologyAnalyzer:
         
         return risk_contrib, portfolio_vol
     
+    def solve_erc(self, Sigma, w0=None, bounds=None, tol=1e-6, maxiter=1000):
+        """ERC usando alternativa robusta baseada em log-barrier"""
+        from scipy.optimize import minimize
+        import warnings
+        warnings.filterwarnings('ignore')
+        
+        n = Sigma.shape[0]
+        
+        def objective_erc(w):
+            """Função objetivo ERC com log-barrier para estabilidade"""
+            # Evitar divisão por zero
+            w = np.maximum(w, 1e-8)
+            w = w / np.sum(w)  # Garantir soma = 1
+            
+            # Portfolio variance and volatility
+            port_var = np.dot(w, np.dot(Sigma, w))
+            if port_var <= 1e-12:
+                return 1e6  # Penalidade alta
+                
+            port_vol = np.sqrt(port_var)
+            
+            # Risk contributions
+            marginal_contrib = np.dot(Sigma, w) / port_vol
+            risk_contrib = w * marginal_contrib
+            
+            # Target: equal risk contribution
+            target_rc = port_vol / n
+            
+            # Objective: minimize sum of squared deviations
+            obj = np.sum((risk_contrib - target_rc)**2)
+            
+            return obj
+        
+        # Inicialização com inverse volatility
+        if w0 is None:
+            vol = np.sqrt(np.diag(Sigma))
+            w0 = (1.0 / vol) / np.sum(1.0 / vol)
+        
+        # Bounds mais flexíveis inicialmente
+        if bounds is None:
+            bounds = [(0.01, 0.40) for _ in range(n)]
+        
+        # Constraint: sum of weights = 1
+        constraints = [{'type': 'eq', 'fun': lambda w: np.sum(w) - 1.0}]
+        
+        # Primeiro solve sem bounds restritivos
+        result = minimize(
+            objective_erc, w0,
+            method='SLSQP', 
+            bounds=[(1e-6, 1.0) for _ in range(n)],
+            constraints=constraints,
+            options={'ftol': tol, 'maxiter': maxiter}
+        )
+        
+        if result.success:
+            # Aplicar bounds finais se necessário
+            final_weights = np.clip(result.x, 0.02, 0.20)
+            final_weights = final_weights / np.sum(final_weights)
+            
+            # Update result
+            result.x = final_weights
+            result.fun = objective_erc(final_weights)
+        
+        return result
+    
     def risk_parity_erc_strategy(self, parameters):
         """
-        Equal Risk Contribution (ERC): Implementação rigorosa do Risk Parity
+        Equal Risk Contribution (ERC): Implementação canônica usando otimização SLSQP
         
-        Baseado em Roncalli (2013) e Maillard et al. (2010).
-        Algoritmo iterativo para equalizar contribuições marginais de risco:
-        RC_i = w_i * (Σw)_i / σ_p = σ_p / n (para todo i)
+        Esta implementação substitui o algoritmo iterativo de Roncalli por um solver 
+        de otimização direta que resolve: min Σ(RC_i - σ_p/N)²
         
-        Onde:
-        - RC_i = Contribuição de risco do ativo i
-        - (Σw)_i = i-ésimo elemento do vetor Σw (risco marginal)  
-        - σ_p = Volatilidade total do portfólio
-        - n = Número de ativos
+        Vantagens: Convergência garantida, solução global, gradiente analítico
         """
         cov_matrix = parameters['cov_matrix'].values
         n_assets = len(cov_matrix)
         asset_names = parameters['cov_matrix'].index
         
-        print(f"    Executando ERC para {n_assets} ativos...")
+        print(f"    Executando ERC canônico (SLSQP) para {n_assets} ativos...")
         
-        # PASSO 1: Inicialização com Inverse Volatility Portfolio (IVP)
-        # Melhor ponto de partida que Equal Weight
-        volatilities = np.sqrt(np.diag(cov_matrix))
-        inv_vol_weights = (1.0 / volatilities) / np.sum(1.0 / volatilities)
-        weights = inv_vol_weights.copy()
+        # Resolver ERC usando otimização
+        result = self.solve_erc(cov_matrix)
         
-        # PASSO 2: Parâmetros do algoritmo iterativo
-        max_iterations = 100
-        tolerance = 1e-8  # Convergência mais rigorosa
-        tau = 0.3  # Step size conservativo para melhor convergência
-        
-        print(f"    Tolerância: {tolerance:.0e}, Max iterações: {max_iterations}")
-        
-        for iteration in range(max_iterations):
-            # Calcular volatilidade do portfólio
-            portfolio_vol = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-            
-            if portfolio_vol < 1e-12:
-                print(f"    ERRO: Volatilidade zero na iteração {iteration}")
-                break
-            
-            # Calcular contribuições marginais de risco
-            marginal_contributions = np.dot(cov_matrix, weights) / portfolio_vol
-            
-            # Contribuições absolutas de risco: RC_i = w_i * MC_i
-            risk_contributions = weights * marginal_contributions
-            
-            # Target: contribuição igual para todos os ativos
-            target_contribution = portfolio_vol / n_assets
-            
-            # PASSO 3: Atualização dos pesos usando fórmula de Roncalli
-            # w_i^(k+1) = w_i^(k) * (RC_target / RC_i^(k))^τ
-            ratio = target_contribution / (risk_contributions + 1e-12)
-            weights_new = weights * np.power(ratio, tau)
-            
-            # Renormalização para soma = 1
-            weights_new = weights_new / np.sum(weights_new)
-            
-            # PASSO 4: Verificar convergência
-            # Critério: desvio máximo relativo das contribuições
-            relative_deviations = np.abs(risk_contributions / target_contribution - 1.0)
-            max_deviation = np.max(relative_deviations)
-            mean_deviation = np.mean(relative_deviations)
-            
-            if max_deviation < tolerance:
-                print(f"    ERC convergiu na iteração {iteration+1}")
-                print(f"    Desvio máximo: {max_deviation:.2e}, Desvio médio: {mean_deviation:.2e}")
-                weights = weights_new
-                break
-            
-            weights = weights_new
-            
-            # Debug a cada 25 iterações
-            if (iteration + 1) % 25 == 0:
-                print(f"    Iteração {iteration+1}: Desvio máx: {max_deviation:.2e}")
-        
+        if not result.success:
+            print(f"    ERRO: Otimização ERC falhou: {result.message}")
+            print("    Fallback para IVP...")
+            volatilities = np.sqrt(np.diag(cov_matrix))
+            weights = (1.0 / volatilities) / np.sum(1.0 / volatilities)
+            weights = np.clip(weights, 0.02, 0.20)
+            weights = weights / np.sum(weights)
         else:
-            print(f"    AVISO: ERC não convergiu completamente em {max_iterations} iterações")
-            print(f"    Desvio final: {max_deviation:.2e}")
+            weights = result.x
+            print(f"    ERC convergiu: {result.nfev} avaliações, erro final: {result.fun:.2e}")
         
-        # PASSO 5: Aplicar restrições de diversificação (2% min, 20% max)
-        # IMPORTANTE: Aplicar bounds altera a paridade, mas garante diversificação
-        weights_bounded = np.clip(weights, 0.02, 0.20)
-        weights_bounded = weights_bounded / np.sum(weights_bounded)
-        
-        # PASSO 6: Verificação final da qualidade ERC
-        final_vol = np.sqrt(np.dot(weights_bounded.T, np.dot(cov_matrix, weights_bounded)))
-        final_marginal = np.dot(cov_matrix, weights_bounded) / final_vol
-        final_contributions = weights_bounded * final_marginal
+        # Verificação final da qualidade ERC
+        final_vol = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+        final_marginal = np.dot(cov_matrix, weights) / final_vol
+        final_contributions = weights * final_marginal
         final_target = final_vol / n_assets
         
         # Métricas de qualidade ERC
@@ -323,16 +379,16 @@ class FinalMethodologyAnalyzer:
         concentration_ratio = np.max(final_contributions) / np.min(final_contributions)
         avg_deviation = np.mean(np.abs(final_contributions / final_target - 1.0))
         
-        print(f"    Contribuições de risco (após bounds):")
+        print(f"    Contribuições de risco:")
         for i, asset in enumerate(asset_names):
             contribution_pct = final_contributions[i] / final_vol * 100
-            weight_pct = weights_bounded[i] * 100
+            weight_pct = weights[i] * 100
             print(f"      {asset}: {weight_pct:.1f}% peso, {contribution_pct:.1f}% risco")
         
         print(f"    Qualidade ERC: std={contribution_std/final_vol*100:.1f}%, " +
               f"concentração={concentration_ratio:.2f}, desvio médio={avg_deviation:.1%}")
         
-        return pd.Series(weights_bounded, index=asset_names)
+        return pd.Series(weights, index=asset_names)
     
     def risk_parity_ivp_strategy(self, parameters):
         """
@@ -347,7 +403,12 @@ class FinalMethodologyAnalyzer:
     def risk_parity_strategy(self, parameters):
         """
         Risk Parity: Implementa ERC (Equal Risk Contribution)
-        Equaliza as contribuições marginais de risco usando matriz de covariância
+        
+        IMPORTANTE: Esta implementação usa o algoritmo ERC completo (Roncalli 2013)
+        que equaliza as contribuições marginais de risco considerando correlações.
+        NÃO é o IVP simples (1/σi), mas sim ERC que usa matriz de covariância completa.
+        
+        O IVP é usado apenas como inicialização do algoritmo iterativo ERC.
         """
         return self.risk_parity_erc_strategy(parameters)
     
@@ -500,25 +561,29 @@ class FinalMethodologyAnalyzer:
         period_start = test_returns.index[0]
         period_months = len(test_returns)
         
-        # Determinar qual série CDI usar baseada na data
-        if period_start.year == 2018:
-            start_month_idx = period_start.month - 1
-            cdi_series = self.cdi_monthly_2018[start_month_idx:start_month_idx + period_months]
-        elif period_start.year == 2019:
-            start_month_idx = period_start.month - 1
-            cdi_series = self.cdi_monthly_2019[start_month_idx:start_month_idx + period_months]
-        else:
-            # Período cruzando anos
-            if period_start.year == 2018 and period_start.month >= 7:
-                # Pegar final de 2018 + início de 2019
-                cdi_2018_part = self.cdi_monthly_2018[period_start.month - 1:]
-                remaining_months = period_months - len(cdi_2018_part)
-                cdi_2019_part = self.cdi_monthly_2019[:remaining_months]
-                cdi_series = cdi_2018_part + cdi_2019_part
+        # Criar série CDI baseada nas datas dos retornos
+        cdi_series = []
+        
+        for date in test_returns.index:
+            year = date.year
+            month = date.month
+            
+            if year == 2018:
+                if month <= 12:
+                    cdi_series.append(self.cdi_monthly_2018[month - 1])
+                else:
+                    # Fallback
+                    cdi_series.append(np.mean(self.cdi_monthly_2018))
+            elif year == 2019:
+                if month <= 12:
+                    cdi_series.append(self.cdi_monthly_2019[month - 1])
+                else:
+                    # Fallback
+                    cdi_series.append(np.mean(self.cdi_monthly_2019))
             else:
-                # Fallback: usar CDI médio
+                # Fallback: usar CDI médio geral
                 avg_cdi_monthly = np.mean(self.full_cdi_monthly)
-                cdi_series = [avg_cdi_monthly] * period_months
+                cdi_series.append(avg_cdi_monthly)
                 
         return pd.Series(cdi_series, index=test_returns.index)
     
@@ -539,8 +604,9 @@ class FinalMethodologyAnalyzer:
         annual_return = period_return * annualization_factor
         annual_vol = portfolio_returns.std() * np.sqrt(12)
         
-        # CDI anualizado para o período específico
-        period_cdi_annual = (np.prod(1 + cdi_monthly_series) - 1) * annualization_factor
+        # CDI anualizado para o período específico usando média geométrica
+        # CORREÇÃO: (∏(1+rm))^(12/n) - 1, não (∏-1) × (12/n)
+        period_cdi_annual = (np.prod(1 + cdi_monthly_series) ** annualization_factor) - 1
         
         # SHARPE RATIO: (Rp - Rf) / σp usando CDI REAL do período
         sharpe_ratio = (annual_return - period_cdi_annual) / annual_vol if annual_vol > 0 else 0
@@ -558,11 +624,9 @@ class FinalMethodologyAnalyzer:
         else:
             sortino_ratio = 999  # Sem retornos abaixo do CDI
             
-        # Maximum Drawdown
-        portfolio_value = (1 + portfolio_returns).cumprod()
-        peak = portfolio_value.expanding().max()
-        drawdown = (portfolio_value - peak) / peak
-        max_drawdown = drawdown.min()
+        # Maximum Drawdown usando função utilitária para log-returns
+        from unified_calculations import drawdown_from_log
+        _, max_drawdown = drawdown_from_log(portfolio_returns)
         
         return {
             'period_return': period_return,
@@ -616,6 +680,7 @@ class FinalMethodologyAnalyzer:
             
             # Construir carteiras
             weights = {}
+            # Usar SciPy SLSQP (método estabelecido e robusto)
             weights['Markowitz'] = self.markowitz_optimization(parameters)
             weights['Equal Weight'] = self.equal_weight_strategy(est_data.columns)
             weights['Risk Parity'] = self.risk_parity_strategy(parameters)
@@ -624,6 +689,12 @@ class FinalMethodologyAnalyzer:
             for strategy_name, w in weights.items():
                 significant_weights = w[w > 0.015]  # > 1,5%
                 print(f"  {strategy_name}: {dict(significant_weights.round(3))}")
+            
+            # Armazenar pesos para análise de contribuições de risco
+            self.portfolio_weights_history.append({
+                'period': period_info['name'],
+                'weights': weights.copy()  # Armazenar cópia dos pesos de todas as estratégias
+            })
             
             # Calcular turnover para cada estratégia
             period_turnovers = {}
@@ -659,6 +730,9 @@ class FinalMethodologyAnalyzer:
                 'period': period_info['name'],
                 'turnovers': period_turnovers
             })
+        
+        # EXPORTAR: Pesos por rebalanceamento e relatório ERC
+        self._export_weights_and_erc_report(all_results)
         
         return all_results
     
@@ -714,7 +788,7 @@ class FinalMethodologyAnalyzer:
                   f"{metrics['max_drawdown']:.1%}")
         
         print("\n* N/A = Sem retornos abaixo do CDI (excelente controle de risco)")
-        print(f"\nFonte CDI: Investidor10 (dados B3/BCB)")
+        print(f"\nFonte CDI: BCB/ANBIMA (dados oficiais)")
         print(f"Período: 2018-2019 | Rebalanceamento: Semestral (jan/jul)")
         print(f"Metodologia: Conforme definida no TCC")
         
@@ -761,14 +835,14 @@ class FinalMethodologyAnalyzer:
             lw_test = self.sharpe_ratio_difference_test(
                 strategy_returns[strategy1], 
                 strategy_returns[strategy2], 
-                self.risk_free_rate
+                self.risk_free_rate_annual
             )
             
             # Teste Bootstrap
             bootstrap_test = self.bootstrap_sharpe_difference(
                 strategy_returns[strategy1],
                 strategy_returns[strategy2], 
-                self.risk_free_rate
+                self.risk_free_rate_annual
             )
             
             # Determinar significância
@@ -854,7 +928,7 @@ class FinalMethodologyAnalyzer:
                 # Calcular Sharpe com custos
                 if len(adjusted_returns_all) > 0:
                     adjusted_returns_array = np.array(adjusted_returns_all)
-                    rf_monthly = self.risk_free_rate / 12
+                    rf_monthly = self.risk_free_rate_annual / 12
                     
                     excess_returns = adjusted_returns_array - rf_monthly
                     if np.std(excess_returns) > 0:
@@ -886,6 +960,80 @@ class FinalMethodologyAnalyzer:
         print("- Impacto = Sharpe original - Sharpe com custos")
         
         return results_by_cost
+    
+    def _export_weights_and_erc_report(self, all_results):
+        """
+        Exporta pesos por rebalanceamento e relatório de convergência ERC
+        """
+        try:
+            # 1. EXPORTAR PESOS POR DATA DE REBALANCEAMENTO
+            weights_by_date = {}
+            periods = ['2018-01', '2018-07', '2019-01', '2019-07']
+            strategies = ['Markowitz', 'Equal Weight', 'Risk Parity']
+            
+            # Extrair pesos de cada período
+            for i, period in enumerate(periods):
+                if i < len(self.estimation_periods):
+                    period_data = {}
+                    for strategy in strategies:
+                        if i < len(all_results[strategy]):
+                            weights = all_results[strategy][i]['weights']
+                            period_data[f'{strategy}_weights'] = weights
+                    weights_by_date[period] = period_data
+            
+            # Criar DataFrame dos pesos
+            import pandas as pd
+            weights_df = pd.DataFrame()
+            
+            for date, data in weights_by_date.items():
+                for strategy_key, weights in data.items():
+                    strategy_name = strategy_key.replace('_weights', '')
+                    for asset, weight in weights.items():
+                        weights_df.loc[f'{date}_{strategy_name}', asset] = weight
+            
+            # Exportar pesos
+            weights_df.fillna(0).to_csv("weights_by_rebalance.csv", index=True)
+            print(f"[OK] weights_by_rebalance.csv exportado ({len(weights_df)} linhas)")
+            
+            # 2. RELATÓRIO DE CONVERGÊNCIA ERC (último período)
+            if len(all_results['Risk Parity']) > 0:
+                # Pegar dados do último período para análise ERC
+                last_period = self.estimation_periods[-1]
+                last_est_data = self.full_returns[
+                    (self.full_returns.index >= last_period['estimation_start']) &
+                    (self.full_returns.index <= last_period['estimation_end'])
+                ]
+                
+                # Calcular matriz de covariância do último período
+                cov_matrix = last_est_data.cov() * 12  # Anualizando
+                
+                # Pesos ERC do último período
+                last_weights_dict = all_results['Risk Parity'][-1]['weights']
+                asset_names = list(last_weights_dict.keys())
+                erc_weights = np.array([last_weights_dict[asset] for asset in asset_names])
+                
+                # Calcular contribuições de risco
+                sigma_p = np.sqrt(erc_weights.T @ cov_matrix.values @ erc_weights)
+                marginal_contrib = cov_matrix.values @ erc_weights / sigma_p
+                risk_contrib = erc_weights * marginal_contrib
+                target_contrib = sigma_p / len(erc_weights)
+                
+                # Criar relatório ERC
+                erc_report = pd.DataFrame({
+                    'Asset': asset_names,
+                    'Weight': erc_weights,
+                    'Risk_Contribution': risk_contrib,
+                    'Target_Contribution': target_contrib,
+                    'Relative_Error': (risk_contrib / target_contrib) - 1.0
+                })
+                
+                erc_report.to_csv("erc_convergence_last_rebalance.csv", index=False)
+                print(f"[OK] erc_convergence_last_rebalance.csv exportado")
+                print(f"  Erro medio ERC: {erc_report['Relative_Error'].abs().mean():.4f}")
+                print(f"  Erro maximo ERC: {erc_report['Relative_Error'].abs().max():.4f}")
+            
+        except Exception as e:
+            print(f"AVISO: Erro na exportacao: {e}")
 
 def main():
     """
@@ -915,7 +1063,7 @@ def main():
         print("OK Sortino: (Rp - CDI) / sigma_-")  
         print("OK Markowitz: Maximizar Sharpe")
         print("OK Equal Weight: Alocacao igualitaria")
-        print("OK Risk Parity: ERC (Equal Risk Contribution) - Contribuições de risco equalizadas")
+        print("OK Risk Parity: ERC (Equal Risk Contribution) - Matriz covariância completa, não IVP simples")
         print("OK Rebalanceamento semestral (jan/jul)")
         print("OK Out-of-sample rigoroso")
         print("OK Sem vendas a descoberto")

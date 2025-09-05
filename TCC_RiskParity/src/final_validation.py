@@ -2,7 +2,7 @@
 Validação Final Completa do TCC
 Verifica se TODAS as correções foram implementadas corretamente
 
-Bruno Gasparini Ballerini - 2025
+Bruno Gasparoni Ballerini - 2025
 """
 
 import os
